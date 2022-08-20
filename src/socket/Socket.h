@@ -1,0 +1,54 @@
+#ifndef SOCKET_H
+#define SOCKET_H
+
+#include <sys/socket.h> // socket api
+#include <sys/types.h>  // socket类型 tcp or udp
+#include <sys/uio.h>    // read、write
+#include <arpa/inet.h>  // ip地址转换
+#include <netinet/in.h> // 字节序转换
+#include <unistd.h>     // 连接关闭
+#include <fcntl.h>
+#include <memory>   // 智能指针
+#include <string>
+
+#include "../log/Log.h"
+#include "./SocketsOps.h"
+#include "../buffer/Buffer.h"
+
+class Address
+{
+public:
+    Address(const std::string& ip, uint16_t port);
+    Address(uint16_t port);
+    ~Address();
+
+    const struct sockaddr* getSockaddr() const;
+
+private:
+    std::string _ip;
+    uint16_t _port;
+    struct sockaddr_in _addr;
+};
+
+class Socket : public std::enable_shared_from_this<Socket>
+{
+public:
+    explicit Socket(int socketFd) : m_socket(socketFd) {}
+    ~Socket();
+
+    bool bind(Address address);
+    bool listen(int maxConn=5);
+    int accept();
+    void close();
+
+    int fd() { return m_socket; }
+    bool setsockopt(int level, int optname, const void* optval, socklen_t optlen);
+    void setFdNonblock();
+
+private:
+    int m_socket = -1;
+};
+
+
+#endif // SOCKET_H
+
