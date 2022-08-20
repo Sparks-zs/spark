@@ -5,6 +5,7 @@
 using namespace std;
 
 HttpRequest::HttpRequest()
+    : _isDone(true)
 {
 
 }
@@ -21,20 +22,20 @@ void HttpRequest::init()
     _path = "";
     _version = "";
     _body = "";
-    _header.clear();
+    _headers.clear();
     _post.clear();
 }
 
-bool HttpRequest::parse(Buffer& buff)
+bool HttpRequest::parse(Buffer* buff)
 {
     const char CRLF[] = "\r\n";
-    if(buff.readableBytes() <= 0){
+    if(buff->readableBytes() <= 0){
         return false;
     }
 
-    while(buff.readableBytes() && _state != FINISH){
-        const char* lineEnd = search(buff.peek(), buff.beginWriteConst(), CRLF, CRLF + 2);
-        string line(buff.peek(), lineEnd);
+    while(buff->readableBytes() && _state != FINISH){
+        const char* lineEnd = search(buff->peek(), buff->beginWriteConst(), CRLF, CRLF + 2);
+        string line(buff->peek(), lineEnd);
         switch (_state)
         {
         case REQUEST_LINE:
@@ -45,26 +46,34 @@ bool HttpRequest::parse(Buffer& buff)
             break;
         case REQUEST_HEADERS:
             _parseRequestHeader(line);
-            if(buff.readableBytes() <= 2){
+            if(buff->readableBytes() <= 2){
                 _state = FINISH;
             }
             break;
         case REQUEST_BODY:
-            if(!_parseRequestBody(line)){
-                return false;
-            }
+            _parseRequestBody(line);
             break;
         default:
             break;
         }
-        buff.retrieveUntil(lineEnd + 2);
+        buff->retrieveUntil(lineEnd + 2);
     }
+    _isDone = true;
     LOG_DEBUG << "HTTP解析完毕: method: " << _method << " url: " << _path << \
                  " version: " << _version << " body: " << _body;
     return true;
 }
 
-bool HttpRequest::_parseRequestLine(const std::string& line)
+string HttpRequest::getHeader(const string& field) const
+{
+    string header;
+    if(_headers.count(field)){
+        header = _headers.find(field)->second;
+    }
+    return header;
+}
+
+bool HttpRequest::_parseRequestLine(const string& line)
 {
     regex patten("^([^ ]*) ([^ ]*) HTTP/([^ ]*)$");
     smatch subMatch;
@@ -83,7 +92,7 @@ bool HttpRequest::_parseRequestHeader(const std::string& header)
     regex patten("^([^:]*): ?(.*)$");
     smatch subMatch;
     if(regex_match(header, subMatch, patten)) {
-        _header[subMatch[1]] = subMatch[2];
+        _headers[subMatch[1]] = subMatch[2];
     }
     else {
         _state = REQUEST_BODY;
@@ -91,11 +100,11 @@ bool HttpRequest::_parseRequestHeader(const std::string& header)
     return true;
 }
 
-bool HttpRequest::_parseRequestBody(const std::string& body)
+bool HttpRequest::_parseRequestBody(const string& body)
 {
     int len = -1;
-    if(_header.count("Content-Length")){
-        len = stoi(_header.find("Content-Lenght")->second);
+    if(_headers.count("Content-Length")){
+        len = stoi(_headers.find("Content-Lenght")->second);
     }
     if(len <= 0 || body.size() < static_cast<size_t>(len)){
         if(len) LOG_DEBUG << "当前请求体大小为: " << len;

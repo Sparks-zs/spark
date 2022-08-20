@@ -5,6 +5,7 @@
 #include "./Channel.h"
 #include "../buffer/Buffer.h"
 #include "../thread/EventLoop.h"
+#include "../http/HttpConn.h"
 
 class TcpConnection : public std::enable_shared_from_this<TcpConnection>
 {
@@ -27,10 +28,16 @@ public:
     void start();
     void stop();
     void destroy();
+
     void send(Buffer* buffer);
     void send(const std::string& str);
+
+    bool connected() { return _state == Connected; }
     void setState(ConnState s) { _state = s; }
     EventLoop* getLoop() { return _loop; }
+
+    void setHttpConn(HttpConn http) { _http = http; }
+    HttpConn getHttpConn() { return _http; }
 
     // 供channel类回调
     void handelRead();
@@ -61,6 +68,8 @@ private:
     ConnState _state;
     std::string _name;
     
+    HttpConn _http;
+
     Buffer _readBuffer;
     Buffer _writeBuffer;
 

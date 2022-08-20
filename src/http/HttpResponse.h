@@ -4,6 +4,9 @@
 #include <string>
 #include <unordered_map>
 
+#include "../filemanager/filemanager.h"
+#include "../log/Log.h"
+
 class Buffer;
 
 class HttpResponse
@@ -13,17 +16,23 @@ public:
     ~HttpResponse();
 
     void init();
-    void makeResponse(Buffer& buff);
+    
+    void setCodeState(int code);
+    void setPath(const std::string& path) { _path = path; }
+    void writeToBuffer(Buffer* buffer) { buffer->append(_responseContent); }
+
+    void makeResponse();
 
 private:
-    void _addStateLine(Buffer& buff);
-    void _addHeader(Buffer& buff);
-    void _addBody(Buffer& buff);
+    void _addStateLine();
+    void _addHeader(const std::string& header, const std::string& field);
+    void _addBody(const Buffer& buff);
 
     int _code;
+    std::string _path;
+    Buffer _responseContent;
 
-    static const std::unordered_map<int, std::string> CODE_STATUS;      // code对应状态
-    static const std::unordered_map<int, std::string> CODE_PATH;        // code对应html路径
+    FileManager _fileManager;
 };
 
 #endif // HTTPRESPONSE_H

@@ -33,7 +33,12 @@ public:
     ~HttpRequest();
 
     void init();
-    bool parse(Buffer& buff);
+    bool parse(Buffer* buff);
+    std::string getHeader(const std::string& field) const;
+
+    bool isDone() { return _isDone; }
+    int codeStatus();
+    std::string getPath() { return _path; }
 
 private:
     bool _parseRequestLine(const std::string& line);
@@ -43,9 +48,12 @@ private:
     void _parsePath();
     void _parsePost();
 
+    bool _isDone;
+
     PARSE_STATE _state;
+    HTTP_CODE _code;
     std::string _method, _path, _version, _body;
-    std::unordered_map<std::string, std::string> _header;
+    std::unordered_map<std::string, std::string> _headers;
     std::unordered_map<std::string, std::string> _post;
     
 };

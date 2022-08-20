@@ -3,6 +3,7 @@
 
 #include "HttpRequest.h"
 #include "HttpResponse.h"
+#include "../buffer/Buffer.h"
 
 class HttpConn
 {
@@ -10,12 +11,12 @@ public:
     HttpConn();
     ~HttpConn();
 
-    void parse();
+    void parse(Buffer* buff);
+    void writeToBuffer(Buffer* buff);
 
 private:
     HttpRequest _request;
     HttpResponse _response;
 };
 
-// ssss
 #endif // HTTPCONN_H

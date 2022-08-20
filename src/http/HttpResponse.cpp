@@ -1,20 +1,8 @@
 #include "HttpResponse.h"
 #include "../buffer/Buffer.h"
+#include "HTTP.h"
 
 using namespace std;
-
-const unordered_map<int, string> HttpResponse::CODE_STATUS = {
-    { 200, "OK" },
-    { 400, "Bad Request" },
-    { 403, "Forbidden" },
-    { 404, "Not Found" },
-};
-
-const unordered_map<int, string> HttpResponse::CODE_PATH = {
-    { 400, "/400.html" },
-    { 403, "/403.html" },
-    { 404, "/404.html" },
-};
 
 HttpResponse::HttpResponse()
     : _code(-1)
@@ -29,27 +17,67 @@ HttpResponse::~HttpResponse()
 
 void HttpResponse::init()
 {
+    _responseContent.retrieveAll();
+}
+
+void HttpResponse::makeResponse()
+{
+    init();
+    _addStateLine();
+    Buffer buff;
+
+    switch(_code){
+    case OK:
+        _fileManager.readFile(_path, &buff);
+        _addHeader("Content-Type", _fileManager.GetFileType());
+        _addHeader("Content-Length", to_string(_fileManager.Size()));
+        _addBody(&buff);
+        break;
+    case BAD_REQUEST:
+        _addHeader("Content-Type", "");
+        _addHeader("Content-Length", 0);
+        break; 
+    case FORBIDDEN:
+        _addHeader("Content-Type", "");
+        _addHeader("Content-Length", 0);
+        break;
+    case NOT_FOUND:
+        _addHeader("Content-Type", "");
+        _addHeader("Content-Length", 0);
+        break;
+    case METHOD_NOT_ALLOWED:
+        _addHeader("Content-Type", "");
+        _addHeader("Content-Length", 0);
+        break;
+    default:
+        break;
+    }
 
 }
 
-void HttpResponse::makeResponse(Buffer& buff)
+void HttpResponse::_addStateLine()
 {
-    _addStateLine(buff);
-    _addHeader(buff);
-    _addBody(buff);
+    string line = "HTTP/1.1 " + to_string(_code) + " " +  HTTP_CODE_REASON.find(_code)->second;
+    _responseContent.append(line);
 }
 
-void HttpResponse::_addStateLine(Buffer& buff)
+void HttpResponse::_addHeader(const std::string& head, const std::string& field)
 {
-
+    string header = head + ": " + field + "\r\n";
+    _responseContent.append(header);
 }
 
-void HttpResponse::_addHeader(Buffer& buff)
+void HttpResponse::_addBody(const Buffer& buff)
 {
-
+    _responseContent.append("\r\n");
+    _responseContent.append(buff);
 }
 
-void HttpResponse::_addBody(Buffer& buff)
+void HttpResponse::setCodeState(int code)
 {
-
+    if(HTTP_CODE_REASON.count(code) == 0){
+        LOG_WARN << "当前不支持此HTTP状态码: " << code;
+        code = 400;
+    }
+    _code = code;
 }
