@@ -55,7 +55,7 @@ public:
         return _begin() + m_writePos;
     }
 
-    const char* beginWrite() const{
+    const char* beginWriteConst() const{
         return _begin() + m_writePos;
     }
 
