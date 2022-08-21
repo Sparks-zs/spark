@@ -28,10 +28,11 @@ void HttpResponse::makeResponse()
 
     switch(_code){
     case OK:
-        // _fileManager.readToBuffer(_path, &buff);
-        // _addHeader("Content-Type", _fileManager.type());
-        // _addHeader("Content-Length", to_string(_fileManager.size()));
-        // break;
+        _fileManager.readToBuffer(_path, &buff);
+        _addHeader("Connection", "keep-alive");
+        _addHeader("Content-Type", _fileManager.type());
+        _addHeader("Content-Length", to_string(_fileManager.size()));
+        break;
     case BAD_REQUEST:
     case FORBIDDEN:
     case NOT_FOUND:
@@ -58,7 +59,7 @@ void HttpResponse::setCodeState(int code)
 
 void HttpResponse::_addStateLine()
 {
-    string line = "HTTP/1.1 " + to_string(_code) + " " +  HTTP_CODE_REASON.find(_code)->second;
+    string line = "HTTP/1.1 " + to_string(_code) + " " +  HTTP_CODE_REASON.find(_code)->second + "\r\n";
     _responseContent.append(line);
 }
 

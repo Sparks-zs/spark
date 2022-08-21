@@ -19,49 +19,30 @@
 #include<iomanip>
 #include <fstream>
 #include <sstream>
+#include <condition_variable>
 
 #include "BlockQueue.h"
 
 class Thread;
 
-class LogStream {
+class LogStream{
 public:
-    void init(int level, const char* dirPath = "./", 
-              int maxQueueCapacity = 1024);
-
-    template<class T>
-    LogStream &operator<<(const T& t){
-        _temp << t;
-        return *this;
-    }
-
     static LogStream* Instance();
-    static void FlushLogThread();
-
-    void flush();
+    void init(int level, const char* dirPath = "./");
+    void flush(const std::string& msg, const std::string& filePath, int lineCount);
 
     int GetLevel();
     void SetLevel(int level);
     std::string levelAsString();
-
-    bool IsOpen() { 
-        return _output.is_open();
-    }
-
     void updateFilePath();
     std::string getFilePath();
-    
-    void setOpt(std::string fileName, int linecount){
-        _fileName = fileName;
-        _lineCount = linecount;
-    }
 
 private:
     LogStream();
     ~LogStream();
     void AsyncWrite_();
+    static void _flushLogThread();
 
-private:
     static const int LOG_PATH_LEN = 256;
     static const int LOG_NAME_LEN = 256;
     static const int MAX_LINES = 50000;
@@ -69,14 +50,11 @@ private:
 
     const char* _dirPath;
     std::string _curFilePath;
-    std::string _fileName;  // 日志打印所在的源文件
-    int _lineCount;         // 日志打印所在的源文件的行数
-    int toDay_;
+    int _toDay;
 
     int _level;
-    bool isAsync_;
+    bool _isFlushing;
 
-    std::ostringstream _temp;   // 存储当前输入的字符，最后合并输出
     std::ofstream _output;
     std::unique_ptr<BlockDeque<std::string>> deque_; 
     std::unique_ptr<Thread> writeThread_;
@@ -86,26 +64,32 @@ private:
 class Logger
 {
 public:
-    Logger(const std::string& file, int line){
-        LogStream::Instance()->setOpt(file, line);
-    }
+    Logger(const std::string& file, int line)
+        : _filePath(file), _lineCount(line){}
     
     ~Logger(){
-        LogStream::Instance()->flush();
+        LogStream::Instance()->flush(_temp.str(), _filePath, _lineCount);
     }
-
-    LogStream& stream(){
-        return *LogStream::Instance();
+    
+    template<class T>
+    Logger &operator<<(const T& t){
+        _temp << t;
+        return *this;
     }
 
     static int getLevel(){
         return LogStream::Instance()->GetLevel();
     }
+
+private:
+    std::string _filePath;
+    int _lineCount;
+    std::ostringstream _temp;   // 存储当前输入的字符，最后合并输出
 };
 
 #define LOG_BASE(level, FILE, LINE) \
     if (Logger::getLevel() <= level) \
-        Logger(FILE, LINE).stream()
+        Logger(FILE, LINE)
 
 #define LOG_DEBUG LOG_BASE(0, __FILE__, __LINE__)
 #define LOG_INFO LOG_BASE(1, __FILE__, __LINE__)

@@ -4,13 +4,10 @@
 using namespace std;
 
 LogStream::LogStream() {
-    _lineCount = -1;
-    isAsync_ = false;
     writeThread_ = nullptr;
     deque_ = nullptr;
-    toDay_ = 0;
+    _toDay = 0;
     _curFilePath = "";
-    _fileName = "";
 }
 
 LogStream::~LogStream() {
@@ -19,7 +16,6 @@ LogStream::~LogStream() {
             deque_->flush();
         };
         deque_->Close();
-        writeThread_->join();
     }
     if(_output.is_open()) {
         lock_guard<mutex> locker(mtx_);
@@ -37,32 +33,25 @@ void LogStream::SetLevel(int level) {
     _level = level;
 }
 
-void LogStream::init(int level, const char* dirPath, int maxQueueSize) 
+void LogStream::init(int level, const char* dirPath) 
 {
     _level = level;
     _dirPath = dirPath;
-    _lineCount = -1;
-    _fileName = "";
-    if(maxQueueSize > 0) {
-        isAsync_ = true;
-        if(!deque_) {
-            unique_ptr<BlockDeque<std::string>> newDeque(new BlockDeque<std::string>);
-            deque_ = move(newDeque);
-            
-            std::unique_ptr<Thread> NewThread(new Thread(FlushLogThread, "LogThread"));
-            writeThread_ = move(NewThread);
-        }
-    } else {
-        isAsync_ = false;
+    if(!deque_) {
+        unique_ptr<BlockDeque<std::string>> newDeque(new BlockDeque<std::string>);
+        deque_ = move(newDeque);
+        
+        std::unique_ptr<Thread> NewThread(new Thread(_flushLogThread, "LogThread"));
+        writeThread_ = move(NewThread);
+        writeThread_->detach();
     }
-
+    
     updateFilePath();
 
     {
         lock_guard<mutex> locker(mtx_);
-        if(_output.is_open()) { 
-            flush();
-            _temp.clear();
+        if(_output.is_open()) {
+            LOG_WARN << "日志流已初始化过";
             _output.close(); 
         }
 
@@ -100,10 +89,10 @@ void LogStream::updateFilePath()
 
     time_t now = time(0);
     tm* ltm = localtime(&now);
-    toDay_ = ltm->tm_mday;
+    _toDay = ltm->tm_mday;
     std::ostringstream fileName;
     fileName << setfill('0') << "TcpServer" << " " << 1900 + ltm->tm_year << setw(2) << 1 + ltm->tm_mon << \
-                toDay_ << '-' << setw(2) << ltm->tm_hour << setw(2) << ltm->tm_min << \
+                _toDay << '-' << setw(2) << ltm->tm_hour << setw(2) << ltm->tm_min << \
                 setw(2) << ltm->tm_sec << ".127.0.0.1." << CurrentThread::tid() << ".log";
     _curFilePath = _dirPath + fileName.str();
 }
@@ -114,17 +103,16 @@ std::string LogStream::getFilePath()
     return _curFilePath;
 }
 
-void LogStream::flush() {
+void LogStream::flush(const std::string& msg, const std::string& filePath, int lineCount) {
     time_t now = time(0);
     tm* ltm = localtime(&now);
     int today = ltm->tm_mday;
 
-    if(toDay_ != today){
+    if(_toDay != today){
         updateFilePath();
         {
             lock_guard<mutex>locker(mtx_);
             if(_output.is_open()){
-                _output.flush();
                 _output.close();
             }
             std::ofstream _output(_curFilePath, std::ofstream::app);
@@ -134,11 +122,10 @@ void LogStream::flush() {
 
     std::ostringstream line;
     line << setfill('0') << 1900 + ltm->tm_year << setw(2) << 1 + ltm->tm_mon << \
-            setw(2) << toDay_ << " " << setw(2) << ltm->tm_hour << ":" << \
+            setw(2) << _toDay << " " << setw(2) << ltm->tm_hour << ":" << \
             setw(2) << ltm->tm_min << ":" << setw(2) << ltm->tm_sec << " " << \
-            CurrentThread::tid() << " " << levelAsString() << " " << _temp.str() << \
-            " - " << _fileName << ":" << _lineCount << std::endl;
-    _temp.str("");      // 清空
+            CurrentThread::tid() << " " << levelAsString() << " " << msg << \
+            " - " << filePath << ":" << lineCount << std::endl;
     
     {
         lock_guard<mutex> locker(mtx_);
@@ -156,6 +143,7 @@ void LogStream::AsyncWrite_() {
     while(deque_->pop(str)) {
         lock_guard<mutex> locker(mtx_);
         _output << str;
+        _output.flush();
     }
 }
 
@@ -164,6 +152,6 @@ LogStream* LogStream::Instance() {
     return &inst;
 }
 
-void LogStream::FlushLogThread() {
+void LogStream::_flushLogThread() {
     LogStream::Instance()->AsyncWrite_();
 }

@@ -12,7 +12,7 @@ class HttpRequest
 public:
     // http报文解析状态码
     enum PARSE_STATE {
-        REQUEST_LINE,
+        REQUEST_LINE = 0,
         REQUEST_HEADERS,
         REQUEST_BODY,
         FINISH,        
@@ -26,7 +26,6 @@ public:
     bool parse(Buffer* buff);
     std::string getHeader(const std::string& field) const;
 
-    bool isDone() { return _isDone; }
     int codeStatus() { return _code; }
     std::string getPath() { return _path; }
 
@@ -37,8 +36,6 @@ private:
 
     void _parsePath();
     void _parsePost();
-
-    bool _isDone;
 
     PARSE_STATE _state;
     HTTP_CODE_STATUS _code;

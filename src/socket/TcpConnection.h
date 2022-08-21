@@ -37,7 +37,7 @@ public:
     EventLoop* getLoop() { return _loop; }
 
     void setHttpConn(HttpConn http) { _http = http; }
-    HttpConn getHttpConn() { return _http; }
+    HttpConn* getHttpConn() { return &_http; }
 
     // 供channel类回调
     void handelRead();

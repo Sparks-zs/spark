@@ -30,8 +30,12 @@ void FileManager::readToBuffer(const string& path, Buffer* buff, int from, int t
         return;
     }
 
-    int length = to == -1 ? _fileState.st_size : to - from;    
-    mmap(buff->beginWrite(), length, PROT_READ, MAP_PRIVATE, fileFd, from);
+    int length = to == -1 ? _fileState.st_size : to - from;   
+    int err; 
+    if(buff->readFd(fileFd, &err) <= 0){
+        LOG_ERROR << "文件读取错误" << path;
+    }
+    // mmap(buff->beginWrite(), length, PROT_READ, MAP_PRIVATE, fileFd, from);
     close(fileFd);
 }
 
@@ -39,7 +43,7 @@ bool FileManager::checkFilePath(const string& path)
 {
     if(stat(path.data(), &_fileState) < 0 || S_ISDIR(_fileState.st_mode))
         return false;
-    if(_fileState.st_mode & S_IROTH)  // 无权限
+    if(!_fileState.st_mode & S_IROTH)  // 无权限
         return false;
     return true;
 }

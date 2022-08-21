@@ -106,6 +106,12 @@ public:
         return result;
     }
 
+    std::string asString()      // use for Debug
+    {
+        std::string result(peek(), readableBytes());
+        return result;
+    }
+
 private:
     char* _begin(){
         return m_buf.data();

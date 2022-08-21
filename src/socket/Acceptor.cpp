@@ -38,6 +38,7 @@ void Accpetor::handleRead()
 {
     // 建立连接
     int connfd = _socket.accept();
+    LOG_DEBUG << "监听到新用户: "<< connfd;
     if(_newConnectionCallback){
         _newConnectionCallback(connfd);
     }

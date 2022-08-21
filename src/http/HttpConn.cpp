@@ -1,9 +1,9 @@
 #include "HttpConn.h"
 #include "HTTP.h"
 
-HttpConn::HttpConn()
+HttpConn::HttpConn(const std::string& cwd)
+    : _cwd(cwd)
 {
-
 }
 
 HttpConn::~HttpConn()
@@ -13,15 +13,12 @@ HttpConn::~HttpConn()
 
 bool HttpConn::parse(Buffer* buff)
 {
-    if(_request.isDone()){
-        _request.init();
-    }
-
+    LOG_DEBUG << "待解析的数据: " << buff->asString();
     if(!_request.parse(buff)){
         return false;
     }
 
-    _response.setPath(_request.getPath());
+    _response.setPath(_cwd + _request.getPath());
     _response.setCodeState(_request.codeStatus());
 
     return true;

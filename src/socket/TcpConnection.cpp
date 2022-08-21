@@ -72,6 +72,7 @@ void TcpConnection::handelRead()
 
 void TcpConnection::handelWrite()
 {
+    LOG_DEBUG << "发送的数据: " << _writeBuffer.asString();
     if(_channel.isWriting()){
         ssize_t n = write(_channel.fd(),
                           _writeBuffer.peek(),
