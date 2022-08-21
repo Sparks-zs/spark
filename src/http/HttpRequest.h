@@ -5,6 +5,7 @@
 #include <string>
 #include "../buffer/Buffer.h"
 #include "../log/Log.h"
+#include "../http/HTTP.h"
 
 class HttpRequest
 {
@@ -17,17 +18,6 @@ public:
         FINISH,        
     };
 
-    // http请求状态码
-    enum HTTP_CODE {
-        NO_REQUEST = 0,
-        GET_REQUEST,
-        BAD_REQUEST,
-        NO_RESOURSE,
-        FORBIDDENT_REQUEST,
-        FILE_REQUEST,
-        INTERNAL_ERROR,
-        CLOSED_CONNECTION,
-    };
 
     HttpRequest();
     ~HttpRequest();
@@ -37,7 +27,7 @@ public:
     std::string getHeader(const std::string& field) const;
 
     bool isDone() { return _isDone; }
-    int codeStatus();
+    int codeStatus() { return _code; }
     std::string getPath() { return _path; }
 
 private:
@@ -51,7 +41,7 @@ private:
     bool _isDone;
 
     PARSE_STATE _state;
-    HTTP_CODE _code;
+    HTTP_CODE_STATUS _code;
     std::string _method, _path, _version, _body;
     std::unordered_map<std::string, std::string> _headers;
     std::unordered_map<std::string, std::string> _post;

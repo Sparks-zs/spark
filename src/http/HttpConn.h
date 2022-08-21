@@ -11,7 +11,7 @@ public:
     HttpConn();
     ~HttpConn();
 
-    void parse(Buffer* buff);
+    bool parse(Buffer* buff);
     void writeToBuffer(Buffer* buff);
 
 private:

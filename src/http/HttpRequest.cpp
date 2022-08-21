@@ -17,6 +17,7 @@ HttpRequest::~HttpRequest()
 
 void HttpRequest::init()
 {
+    _code = NO_REQUEST;
     _state = REQUEST_LINE;
     _method = " ";
     _path = "";
@@ -58,20 +59,13 @@ bool HttpRequest::parse(Buffer* buff)
         }
         buff->retrieveUntil(lineEnd + 2);
     }
+    _code = OK;
     _isDone = true;
     LOG_DEBUG << "HTTP解析完毕: method: " << _method << " url: " << _path << \
                  " version: " << _version << " body: " << _body;
     return true;
 }
 
-string HttpRequest::getHeader(const string& field) const
-{
-    string header;
-    if(_headers.count(field)){
-        header = _headers.find(field)->second;
-    }
-    return header;
-}
 
 bool HttpRequest::_parseRequestLine(const string& line)
 {
@@ -84,7 +78,17 @@ bool HttpRequest::_parseRequestLine(const string& line)
         _state = REQUEST_HEADERS;
         return true;
     }
+    _code = BAD_REQUEST;
     return false;
+}
+
+string HttpRequest::getHeader(const string& field) const
+{
+    string header;
+    if(_headers.count(field)){
+        header = _headers.find(field)->second;
+    }
+    return header;
 }
 
 bool HttpRequest::_parseRequestHeader(const std::string& header)

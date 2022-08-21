@@ -73,7 +73,7 @@ private:
     int _lineCount;         // 日志打印所在的源文件的行数
     int toDay_;
 
-    int level_;
+    int _level;
     bool isAsync_;
 
     std::ostringstream _temp;   // 存储当前输入的字符，最后合并输出

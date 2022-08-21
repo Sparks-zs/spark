@@ -29,17 +29,17 @@ LogStream::~LogStream() {
 
 int LogStream::GetLevel() {
     lock_guard<mutex> locker(mtx_);
-    return level_;
+    return _level;
 }
 
 void LogStream::SetLevel(int level) {
     lock_guard<mutex> locker(mtx_);
-    level_ = level;
+    _level = level;
 }
 
 void LogStream::init(int level, const char* dirPath, int maxQueueSize) 
 {
-    level_ = level;
+    _level = level;
     _dirPath = dirPath;
     _lineCount = -1;
     _fileName = "";
@@ -74,7 +74,7 @@ void LogStream::init(int level, const char* dirPath, int maxQueueSize)
 std::string LogStream::levelAsString()
 {
     string level_str;
-    switch(level_) {
+    switch(_level) {
     case 0:
         level_str = "DEBUG";
         break;

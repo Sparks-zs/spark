@@ -28,31 +28,32 @@ void HttpResponse::makeResponse()
 
     switch(_code){
     case OK:
-        _fileManager.readFile(_path, &buff);
-        _addHeader("Content-Type", _fileManager.GetFileType());
-        _addHeader("Content-Length", to_string(_fileManager.Size()));
-        _addBody(&buff);
-        break;
+        // _fileManager.readToBuffer(_path, &buff);
+        // _addHeader("Content-Type", _fileManager.type());
+        // _addHeader("Content-Length", to_string(_fileManager.size()));
+        // break;
     case BAD_REQUEST:
-        _addHeader("Content-Type", "");
-        _addHeader("Content-Length", 0);
-        break; 
     case FORBIDDEN:
-        _addHeader("Content-Type", "");
-        _addHeader("Content-Length", 0);
-        break;
     case NOT_FOUND:
-        _addHeader("Content-Type", "");
-        _addHeader("Content-Length", 0);
-        break;
     case METHOD_NOT_ALLOWED:
-        _addHeader("Content-Type", "");
-        _addHeader("Content-Length", 0);
+        buff.append("Return Nothing");
+        _addHeader("Content-Type", "text/plain");
+        _addHeader("Content-Length", to_string(buff.readableBytes()));
         break;
     default:
         break;
     }
 
+    _addBody(buff);
+}
+
+void HttpResponse::setCodeState(int code)
+{
+    if(HTTP_CODE_REASON.count(code) == 0){
+        LOG_WARN << "当前不支持此HTTP状态码: " << code;
+        code = BAD_REQUEST;
+    }
+    _code = code;
 }
 
 void HttpResponse::_addStateLine()
@@ -73,11 +74,3 @@ void HttpResponse::_addBody(const Buffer& buff)
     _responseContent.append(buff);
 }
 
-void HttpResponse::setCodeState(int code)
-{
-    if(HTTP_CODE_REASON.count(code) == 0){
-        LOG_WARN << "当前不支持此HTTP状态码: " << code;
-        code = 400;
-    }
-    _code = code;
-}

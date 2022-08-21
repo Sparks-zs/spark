@@ -6,6 +6,7 @@
 #include <string>
 
 enum HTTP_CODE_STATUS{
+    NO_REQUEST = -1,
     OK = 200,
     BAD_REQUEST = 400,
     UNAUTHORIZED = 401,
@@ -31,6 +32,28 @@ enum HTTP_METHOD{
     TRACE,
     OPTIONS,
     DELETE
+};
+
+const std::unordered_map<std::string, std::string> SUFFIX_TYPE = {
+    { ".txt",   "text/plain" },
+    { ".html",  "text/html" },
+    { ".xml",   "text/xml" },
+    { ".css",   "text/css "},
+    { ".js",    "text/javascript "},
+    { ".xhtml", "application/xhtml+xml" },
+    { ".rtf",   "application/rtf" },
+    { ".pdf",   "application/pdf" },
+    { ".word",  "application/nsword" },
+    { ".gz",    "application/x-gzip" },
+    { ".tar",   "application/x-tar" },
+    { ".png",   "image/png" },
+    { ".gif",   "image/gif" },
+    { ".jpg",   "image/jpeg" },
+    { ".jpeg",  "image/jpeg" },
+    { ".au",    "audio/basic" },
+    { ".mpeg",  "video/mpeg" },
+    { ".mpg",   "video/mpeg" },
+    { ".avi",   "video/x-msvideo" },
 };
 
 #endif // HTTP_H

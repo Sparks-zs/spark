@@ -22,22 +22,21 @@ public:
     ~FileManager();
 
     // 文件处理模块
-    void readFile(const std::string& path, Buffer* buff);
-    size_t Size();
-    void UnmapFile();
-    char* Get(std::string file, int from = 0, int to = -1);
-    std::vector<std::string> GetSubDirName(std::string path);
-    std::string GetFileType(std::string path);
+    void readToBuffer(const std::string& path, Buffer* buff, int from = 0, int to = -1);
+    bool checkFilePath(const std::string& path);
+
+    size_t size();
+    std::string type() { return _fileType; }
+    std::string getFileType(const std::string& path);
 
 private:
+    std::vector<std::string> GetSubDirName(std::string path);
     size_t GetSubDirNum(std::string dirPath);
 
-    char* mmFile_;
-    struct stat mmFileStat_;
-    std::string curFilePath_;
-
-    static const std::unordered_map<std::string, std::string> SUFFIX_TYPE;  // 文件后缀对应的编码类型
+    struct stat _fileState;
+    std::string _filePath;
+    std::string _fileType;
 };
 
 
-#endif FILEMANAGER_H
+#endif //FILEMANAGER_H

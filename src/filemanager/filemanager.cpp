@@ -1,72 +1,47 @@
 #include "filemanager.h"
+#include "../http/HTTP.h"
 
 using namespace std;
 
-const unordered_map<string, string> FileManager::SUFFIX_TYPE = {
-    { ".html",  "text/html" },
-    { ".xml",   "text/xml" },
-    { ".xhtml", "application/xhtml+xml" },
-    { ".txt",   "text/plain" },
-    { ".rtf",   "application/rtf" },
-    { ".pdf",   "application/pdf" },
-    { ".word",  "application/nsword" },
-    { ".png",   "image/png" },
-    { ".gif",   "image/gif" },
-    { ".jpg",   "image/jpeg" },
-    { ".jpeg",  "image/jpeg" },
-    { ".au",    "audio/basic" },
-    { ".mpeg",  "video/mpeg" },
-    { ".mpg",   "video/mpeg" },
-    { ".avi",   "video/x-msvideo" },
-    { ".gz",    "application/x-gzip" },
-    { ".tar",   "application/x-tar" },
-    { ".css",   "text/css "},
-    { ".js",    "text/javascript "},
-};
-
 FileManager::FileManager()
 {
-    mmFile_ = nullptr; 
-    mmFileStat_ = { 0 };
-    curFilePath_ = "";
+    _fileState = { 0 };
+    _filePath = "";
+    _fileType = "";
 }
 
 FileManager::~FileManager()
 {
-    UnmapFile();
 }
 
-char* FileManager::Get(string path, int from, int to)
+void FileManager::readToBuffer(const string& path, Buffer* buff, int from, int to)
 {
-    if(stat(path.data(), &mmFileStat_) < 0 || S_ISDIR(mmFileStat_.st_mode))
+    if(!checkFilePath(path)){
+        LOG_ERROR << "File path is error";
         return;
-    if(mmFileStat_.st_mode & S_IROTH)  // 无权限
-        return;
+    }
 
-    int fileFd = open(path.data(), O_RDONLY);    
+    _filePath = path;
+    _fileType = getFileType(path);
+
+    int fileFd = open(_filePath.data(), O_RDONLY);    
     if(fileFd < 0){
-        LOG_DEBUG << "File NotFound!";
+        LOG_ERROR << "File NotFound!";
         return;
     }
 
-    int length = to == -1 ? mmFileStat_.st_size : to - from;       
-    int* mmRet = (int*)mmap(0, length, PROT_READ, MAP_PRIVATE, fileFd, from);
-    if(*mmRet == -1){
-        LOG_DEBUG << "mmap failed";
-        return;
-    }
-    mmFile_ = (char*)mmRet;
+    int length = to == -1 ? _fileState.st_size : to - from;    
+    mmap(buff->beginWrite(), length, PROT_READ, MAP_PRIVATE, fileFd, from);
     close(fileFd);
-
-    return mmFile_;
 }
 
-void FileManager::UnmapFile()
+bool FileManager::checkFilePath(const string& path)
 {
-    if(mmFile_) {
-        munmap(mmFile_, mmFileStat_.st_size);
-        mmFile_ = nullptr;
-    }
+    if(stat(path.data(), &_fileState) < 0 || S_ISDIR(_fileState.st_mode))
+        return false;
+    if(_fileState.st_mode & S_IROTH)  // 无权限
+        return false;
+    return true;
 }
 
 std::vector<std::string> FileManager::GetSubDirName(std::string path)
@@ -121,7 +96,7 @@ size_t FileManager::GetSubDirNum(std::string dirPath)
     return num;
 }
 
-string FileManager::GetFileType(string path)
+string FileManager::getFileType(const string& path)
 {
     /* 判断文件类型 */
     string::size_type idx = path.find_last_of('.');
@@ -135,7 +110,7 @@ string FileManager::GetFileType(string path)
     return "text/plain";
 }
 
-size_t FileManager::Size()
+size_t FileManager::size()
 {
-    return mmFileStat_.st_size;
+    return _fileState.st_size;
 }

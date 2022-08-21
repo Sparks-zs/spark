@@ -11,18 +11,24 @@ HttpConn::~HttpConn()
 
 }
 
-void HttpConn::parse(Buffer* buff)
+bool HttpConn::parse(Buffer* buff)
 {
     if(_request.isDone()){
         _request.init();
     }
 
-    _request.parse(buff);
+    if(!_request.parse(buff)){
+        return false;
+    }
+
     _response.setPath(_request.getPath());
     _response.setCodeState(_request.codeStatus());
+
+    return true;
 }
 
 void HttpConn::writeToBuffer(Buffer* buff)
 {
+    _response.makeResponse();
     _response.writeToBuffer(buff);
 }

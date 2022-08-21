@@ -29,9 +29,9 @@ void HttpServer::onConnection(const TcpConnection::TcpConnectionPtr& conn)
 void HttpServer::onRead(const TcpConnection::TcpConnectionPtr& conn, Buffer* buff)
 {
     HttpConn http = conn->getHttpConn();
-    http.parse(buff);
-
-    Buffer write_buf;
-    http.writeToBuffer(&write_buf);
-    conn->send(&write_buf);
+    if(http.parse(buff)){
+        Buffer write_buf;
+        http.writeToBuffer(&write_buf);
+        conn->send(&write_buf);
+    }
 }
