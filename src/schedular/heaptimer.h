@@ -9,22 +9,15 @@
 #include <functional> 
 #include <assert.h> 
 #include <chrono>
+#include <memory>
 
-typedef std::function<void()> TimeoutCallBack;
-typedef std::chrono::high_resolution_clock Clock;
-typedef std::chrono::milliseconds MS;
-typedef Clock::time_point TimeStamp;
+#include "TimeStamp.h"
 
-struct TimerNode {
-    int id;
-    TimeStamp expires;          // 定时器绝对时间
-    TimeoutCallBack cb;         // 回调函数
-    bool operator<(const TimerNode& t) {
-        return expires < t.expires;
-    }
-};
 class HeapTimer {               // 时间堆，以最小超时时间为心跳时间
 public:
+    typedef std::function<void()> TimeoutCallBack;
+    typedef std::shared_ptr<HeapTimer> HeapTimerPtr;
+    
     HeapTimer() { heap_.reserve(64); }
 
     ~HeapTimer() { clear(); }
@@ -44,6 +37,12 @@ public:
     int GetNextTick();      // 清除超时结点，并返回下一个结点的超时时间
 
 private:
+    struct TimerNode{
+        int id;
+        TimeoutCallBack cb;
+        TimeStamp timestamp;
+    };
+
     void del_(size_t i);    // 删除结点
     
     void siftup_(size_t i);         // 向上调整

@@ -11,7 +11,7 @@
 
 #include "../log/Log.h"
 #include "CurrentThread.h"
-// #include "heaptimer.h"
+#include "../schedular/heaptimer.h"
 
 class Channel;
 class Epoller;
@@ -46,7 +46,6 @@ public:
     void runInLoop(const Functor& cb);
     void queueInLoop(const Functor& cb);
 
-
 private:
     typedef std::vector<Channel*>ChannelList;
     void _handleRead();
@@ -57,10 +56,11 @@ private:
     bool _callingPendingFunctors;
     const pid_t _threadId;
     int _wakeupFd;
+    int _timeoutMs;
+
     std::unique_ptr<Channel> _wakeupChannel;
     std::unique_ptr<Epoller> _epoller;
     ChannelList _activeChannels;
-    //HeapTimer* _timer;
     std::mutex _mutex;
     std::vector<Functor> _pendingFunctors;
 

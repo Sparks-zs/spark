@@ -6,6 +6,7 @@
 #include "../buffer/Buffer.h"
 #include "../thread/EventLoop.h"
 #include "../http/HttpConn.h"
+#include "../schedular/heaptimer.h"
 
 class TcpConnection : public std::enable_shared_from_this<TcpConnection>
 {
@@ -22,7 +23,10 @@ public:
     typedef std::function<void(const TcpConnectionPtr&)> WriteCallback;
     typedef std::function<void(const TcpConnectionPtr&)> CloseCallback;
 
-    TcpConnection(EventLoop* loop, int sockfd, const std::string& name="TcpConnection");
+    TcpConnection(EventLoop* loop,
+                  int sockfd, 
+                  const std::string& name = "TcpConnection");
+
     ~TcpConnection();
 
     void start();
@@ -31,6 +35,8 @@ public:
 
     void send(Buffer* buffer);
     void send(const std::string& str);
+
+    int getSocketFd() { return _socket->fd(); }
 
     bool connected() { return _state == Connected; }
     void setState(ConnState s) { _state = s; }
@@ -67,7 +73,7 @@ private:
     Channel _channel;
     ConnState _state;
     std::string _name;
-    
+
     HttpConn _http;
 
     Buffer _readBuffer;

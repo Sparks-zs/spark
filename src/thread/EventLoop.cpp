@@ -43,9 +43,11 @@ void EventLoop::loop()
     _isLooping = true;
     _quit = false;
 
+    int timeMs = -1;
+
     while(!_quit){
         _activeChannels.clear();
-        _epoller->poll(&_activeChannels);
+        _epoller->poll(&_activeChannels, timeMs);
         for(ChannelList::iterator iter = _activeChannels.begin();
             iter != _activeChannels.end(); iter++){
             (*iter)->handleEvent();

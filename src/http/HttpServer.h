@@ -3,6 +3,7 @@
 
 #include "../socket/TcpConnection.h"
 #include "../socket/TcpServer.h"
+#include "../schedular/heaptimer.h"
 
 class HttpServer
 {

@@ -9,7 +9,7 @@ void HeapTimer::siftup_(size_t i) {
     assert(i >= 0 && i < heap_.size());
     size_t j = (i - 1) / 2;
     while(j >= 0) {
-        if(heap_[j] < heap_[i]) { break; }
+        if(heap_[j].timestamp < heap_[i].timestamp) { break; }
         SwapNode_(i, j);
         i = j;
         j = (i - 1) / 2;
@@ -30,8 +30,8 @@ bool HeapTimer::siftdown_(size_t index, size_t n) {
     size_t i = index;
     size_t j = i * 2 + 1;
     while(j < n) {
-        if(j + 1 < n && heap_[j + 1] < heap_[j]) j++;
-        if(heap_[i] < heap_[j]) break;
+        if(j + 1 < n && heap_[j + 1].timestamp < heap_[j].timestamp) j++;
+        if(heap_[i].timestamp < heap_[j].timestamp) break;
         SwapNode_(i, j);
         i = j;
         j = i * 2 + 1;
@@ -46,13 +46,13 @@ void HeapTimer::add(int id, int timeout, const TimeoutCallBack& cb) {
         /* 新节点：堆尾插入，调整堆 */
         i = heap_.size();
         ref_[id] = i;
-        heap_.push_back({id, Clock::now() + MS(timeout), cb});
+        heap_.push_back({id, cb, Clock::now() + MS(timeout)});
         siftup_(i);
     } 
     else {
         /* 已有结点：调整堆 */
         i = ref_[id];
-        heap_[i].expires = Clock::now() + MS(timeout);
+        heap_[i].timestamp.adjust(Clock::now() + MS(timeout));
         heap_[i].cb = cb;
         if(!siftdown_(i, heap_.size())) {
             siftup_(i);
@@ -92,7 +92,7 @@ void HeapTimer::del_(size_t index) {
 void HeapTimer::adjust(int id, int timeout) {
     /* 调整指定id的结点 */
     assert(!heap_.empty() && ref_.count(id) > 0);
-    heap_[ref_[id]].expires = Clock::now() + MS(timeout);;
+    heap_[ref_[id]].timestamp.adjust(Clock::now() + MS(timeout));
     siftdown_(ref_[id], heap_.size());
 }
 
@@ -103,7 +103,7 @@ void HeapTimer::tick() {
     }
     while(!heap_.empty()) {
         TimerNode node = heap_.front();
-        if(std::chrono::duration_cast<MS>(node.expires - Clock::now()).count() > 0) { 
+        if(TimeStamp::timeDifference(node.timestamp, Clock::now()) > 0) { 
             break; 
         }
         node.cb();
@@ -125,7 +125,7 @@ int HeapTimer::GetNextTick() {
     tick();
     size_t res = -1;
     if(!heap_.empty()) {
-        res = std::chrono::duration_cast<MS>(heap_.front().expires - Clock::now()).count();
+        res = TimeStamp::timeDifference(heap_.front().timestamp, Clock::now());
         if(res < 0) { res = 0; }
     }
     return res;

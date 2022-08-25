@@ -1,7 +1,8 @@
 #include "TcpConnection.h"
 
-TcpConnection::TcpConnection(EventLoop* loop, int sockfd
-    , const std::string& name)
+TcpConnection::TcpConnection(EventLoop* loop,
+                             int sockfd,
+                             const std::string& name)
     : _socket(new Socket(sockfd)), _loop(loop), 
      _channel(Channel(loop, sockfd)), _state(Connecting),
      _name(name)
@@ -94,7 +95,7 @@ void TcpConnection::handleError()
 
 void TcpConnection::handleClose()
 {
-    LOG_DEBUG << _name << "is closing";
+    LOG_DEBUG << _name << " is closing";
     _closeCallback(shared_from_this());
 }
 

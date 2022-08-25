@@ -28,7 +28,7 @@ const struct sockaddr* Address::getSockaddr() const
 
 Socket::~Socket()
 {
-    
+    close();
 }
 
 bool Socket::bind(Address address)
