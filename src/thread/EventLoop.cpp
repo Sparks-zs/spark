@@ -10,7 +10,8 @@ EventLoop::EventLoop()
       _threadId(CurrentThread::tid()),
       _wakeupFd(eventfd(0, EFD_NONBLOCK | EFD_CLOEXEC)),
       _wakeupChannel(new Channel(this, _wakeupFd)),
-      _epoller(new Epoller(this))
+      _epoller(new Epoller(this)),
+      _timerQueue(new TimerQueue(this))
 {
     LOG_DEBUG << "Eventloop create in thread " << _threadId;
     if(t_loopInThisThread){
@@ -66,7 +67,6 @@ void EventLoop::quit()
     }
 }
 
-
 void EventLoop::updateChannel(Channel* channel)
 {
     assert(channel->ownerLoop() == this);
@@ -101,6 +101,12 @@ void EventLoop::queueInLoop(const Functor& cb)
     if(!isInLoopThread() || _callingPendingFunctors){
         wakeup();
     }
+}
+
+void EventLoop::runEvery(double interval, Timer::TimeCallback cb)
+{
+    TimeStamp time = TimeStamp::now().addTime(interval);
+    _timerQueue->addTimer(time, interval, cb);
 }
 
 void EventLoop::_doPendingFunctors()

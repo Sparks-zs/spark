@@ -26,9 +26,15 @@ void TcpConnection::start()
 
 }
 
-void TcpConnection::stop()
+void TcpConnection::close()
 {
+    _loop->runInLoop(std::bind(&TcpConnection::_closeInLoop, this));
+}
 
+void TcpConnection::_closeInLoop()
+{
+    _loop->assertInLoopThread();
+    handleClose();
 }
 
 void TcpConnection::destroy()
@@ -60,7 +66,7 @@ void TcpConnection::handelRead()
     ssize_t n = _readBuffer.readFd(_channel.fd(), &saveErr);
     LOG_DEBUG << _name << " readed " << n << " bytes";
     if(n > 0){
-        _readCallback(shared_from_this(), &_readBuffer);
+        _readCallback(shared_from_this(), &_readBuffer, TimeStamp::now());
     }
     else if(n == 0){
         handleClose();

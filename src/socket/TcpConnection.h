@@ -1,12 +1,13 @@
 #ifndef TCPCONNECTION_H
 #define TCPCONNECTION_H
 
+#include <any>
+
 #include "Socket.h"
 #include "./Channel.h"
 #include "../buffer/Buffer.h"
 #include "../thread/EventLoop.h"
 #include "../http/HttpConn.h"
-#include "../schedular/heaptimer.h"
 
 class TcpConnection : public std::enable_shared_from_this<TcpConnection>
 {
@@ -19,7 +20,7 @@ public:
 
     typedef std::shared_ptr<TcpConnection> TcpConnectionPtr;
     typedef std::function<void(const TcpConnectionPtr&)> ConnectionCallback;
-    typedef std::function<void(const TcpConnectionPtr&, Buffer*)> ReadCallback;
+    typedef std::function<void(const TcpConnectionPtr&, Buffer*, TimeStamp)> ReadCallback;
     typedef std::function<void(const TcpConnectionPtr&)> WriteCallback;
     typedef std::function<void(const TcpConnectionPtr&)> CloseCallback;
 
@@ -30,20 +31,21 @@ public:
     ~TcpConnection();
 
     void start();
-    void stop();
+    void close();
     void destroy();
 
     void send(Buffer* buffer);
     void send(const std::string& str);
 
     int getSocketFd() { return _socket->fd(); }
+    std::string name() { return _name; }
 
     bool connected() { return _state == Connected; }
     void setState(ConnState s) { _state = s; }
     EventLoop* getLoop() { return _loop; }
 
-    void setHttpConn(HttpConn http) { _http = http; }
-    HttpConn* getHttpConn() { return &_http; }
+    void setContext(std::any context) { _context = context; }
+    std::any* getContext() { return &_context; }
 
     // 供channel类回调
     void handelRead();
@@ -68,13 +70,15 @@ public:
     void connectionEstablished();
     
 private:
+    void _closeInLoop();
+
     Socket* _socket;
     EventLoop* _loop;
     Channel _channel;
     ConnState _state;
     std::string _name;
 
-    HttpConn _http;
+    std::any _context;
 
     Buffer _readBuffer;
     Buffer _writeBuffer;

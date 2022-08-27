@@ -3,12 +3,10 @@
 
 #include <sys/socket.h> // socket api
 #include <sys/types.h>  // socket类型 tcp or udp
-#include <sys/uio.h>    // read、write
 #include <arpa/inet.h>  // ip地址转换
 #include <netinet/in.h> // 字节序转换
 #include <unistd.h>     // 连接关闭
 #include <fcntl.h>
-#include <memory>   // 智能指针
 #include <string>
 
 #include "../log/Log.h"

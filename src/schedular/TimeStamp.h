@@ -13,15 +13,16 @@ class TimeStamp
 public:
 
     TimeStamp(Clock::time_point time);
+    TimeStamp(){}
     ~TimeStamp();
 
-    bool operator<(const TimeStamp& t){
-        return _expires < t._expires;
-    }
+    // bool operator<(TimeStamp t){
+    //     return _expires < t._expires;
+    // }
 
-    bool operator==(const TimeStamp& t){
-        return _expires == t._expires;
-    }
+    // bool operator==(TimeStamp t){
+    //     return _expires == t._expires;
+    // }
 
     static TimeStamp now(){
         return TimeStamp(Clock::now());
@@ -32,12 +33,23 @@ public:
         _expires = t;
     }
 
+    Clock::time_point expiration() { return _expires; }
+
     TimeStamp& addTime(int ms);
     TimeStamp& addTime(const TimeStamp& t);
-    static size_t timeDifference(TimeStamp high, TimeStamp low);
+    static int timeDifference(TimeStamp high, TimeStamp low);
 
 private:
     Clock::time_point _expires;
 };
+
+inline bool operator<(TimeStamp lhs, TimeStamp rhs){
+    return lhs.expiration() < rhs.expiration();
+}
+
+inline bool operator==(TimeStamp lhs, TimeStamp rhs){
+    return lhs.expiration() == rhs.expiration();
+}
+
 
 #endif // TIME_H

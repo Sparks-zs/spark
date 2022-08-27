@@ -1,11 +1,10 @@
 #include "TcpServer.h"
 #include "../thread/EventLoopThreadPool.h"
 
-TcpServer::TcpServer(EventLoop* loop, uint16_t port, int numThreadPool, int timeoutMs)
+TcpServer::TcpServer(EventLoop* loop, uint16_t port, int numThreadPool)
     : _loop(loop),
       _ioLoops(new EventLoopThreadPool(loop, numThreadPool, "IoPool")),
       _accpetor(new Accpetor(_loop, port)),
-      _timeoutMs(timeoutMs), _timer(new HeapTimer()),
       _connectionCallback(defaultConnectionCallback),
       _readCallback(defaultReadCallback),
       _writeCallback(defaultWriteCallback)
@@ -63,4 +62,3 @@ void TcpServer::removeConnection(const TcpConnection::TcpConnectionPtr& conn)
     EventLoop *ioLoop = conn->getLoop();
     ioLoop->queueInLoop(std::bind(&TcpConnection::destroy, conn));
 }
-    
