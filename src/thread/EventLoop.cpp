@@ -103,9 +103,9 @@ void EventLoop::queueInLoop(const Functor& cb)
     }
 }
 
-void EventLoop::runEvery(double interval, Timer::TimeCallback cb)
+void EventLoop::runEvery(int interval, Timer::TimeCallback cb)
 {
-    TimeStamp time = TimeStamp::now().addTime(interval);
+    Time time(Time::now() + interval);
     _timerQueue->addTimer(time, interval, cb);
 }
 

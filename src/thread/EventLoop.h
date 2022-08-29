@@ -46,7 +46,7 @@ public:
     void runInLoop(const Functor& cb);
     void queueInLoop(const Functor& cb);
 
-    void runEvery(double interval, Timer::TimeCallback cb);
+    void runEvery(int interval, Timer::TimeCallback cb);
 
 private:
     typedef std::vector<Channel*>ChannelList;

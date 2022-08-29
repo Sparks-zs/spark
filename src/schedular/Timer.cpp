@@ -1,8 +1,8 @@
 #include "Timer.h"
 
-void Timer::restart(TimeStamp now)
+void Timer::restart(Time now)
 {
     if(isRepeat()){
-        _expiration.addTime(now.addTime(_interval));
+        _expiration = now + _interval;
     }
 }

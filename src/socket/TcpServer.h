@@ -37,7 +37,7 @@ public:
     static void defaultConnectionCallback(const TcpConnection::TcpConnectionPtr& conn){
 
     }
-    static void defaultReadCallback(const TcpConnection::TcpConnectionPtr& conn, Buffer* buff, TimeStamp time){
+    static void defaultReadCallback(const TcpConnection::TcpConnectionPtr& conn, Buffer* buff, Time time){
         
     }
     static void defaultWriteCallback(const TcpConnection::TcpConnectionPtr& conn){

@@ -17,19 +17,19 @@ public:
     void start();
 
     void onConnection(const TcpConnection::TcpConnectionPtr& conn);
-    void onRead(const TcpConnection::TcpConnectionPtr& conn, Buffer* buf, TimeStamp time);
+    void onRead(const TcpConnection::TcpConnectionPtr& conn, Buffer* buf, Time time);
     void onTimer();
 
 private:
     typedef std::list<std::weak_ptr<TcpConnection>> WeakConnectionList;
     struct Node{
-        TimeStamp lastReciveTime;
+        Time lastReciveTime;
         WeakConnectionList::iterator poistion;
         HttpConn http;
     };
 
     std::string _cwd;
-    int _idleSeconds;
+    int _idleMilliSeconds;
     TcpServer _server;
     WeakConnectionList _connections;
 };

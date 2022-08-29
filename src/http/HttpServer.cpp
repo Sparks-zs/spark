@@ -1,13 +1,13 @@
 #include "HttpServer.h"
 
 HttpServer::HttpServer(EventLoop* loop, uint16_t port, int idleSeconds)
-    : _cwd("./"), _idleSeconds(idleSeconds) ,_server(TcpServer(loop, port))
+    : _cwd("./"), _idleMilliSeconds(idleSeconds) ,_server(TcpServer(loop, port))
 {
     _server.setConnectionCallback(std::bind(
         &HttpServer::onConnection, this, std::placeholders::_1));
     _server.setReadCallback(std::bind(
         &HttpServer::onRead, this, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3));
-    loop->runEvery(1.0, std::bind(&HttpServer::onTimer, this));
+    loop->runEvery(1000, std::bind(&HttpServer::onTimer, this));
 }
 
 HttpServer::~HttpServer()
@@ -29,7 +29,7 @@ void HttpServer::onConnection(const TcpConnection::TcpConnectionPtr& conn)
 {
     if(conn->connected()){
         Node node;
-        node.lastReciveTime = TimeStamp::now();
+        node.lastReciveTime = Time::now();
         node.http = HttpConn(_cwd);
         conn->setContext(node);
         _connections.push_back(conn);
@@ -37,7 +37,7 @@ void HttpServer::onConnection(const TcpConnection::TcpConnectionPtr& conn)
     }
 }
 
-void HttpServer::onRead(const TcpConnection::TcpConnectionPtr& conn, Buffer* buff, TimeStamp time)
+void HttpServer::onRead(const TcpConnection::TcpConnectionPtr& conn, Buffer* buff, Time time)
 {
     Node* node = std::any_cast<Node>(conn->getContext());
     if(node->http.parse(buff)){
@@ -50,15 +50,15 @@ void HttpServer::onRead(const TcpConnection::TcpConnectionPtr& conn, Buffer* buf
 
 void HttpServer::onTimer()
 {
-    TimeStamp now = TimeStamp::now();
+    Time now = Time::now();
     for (WeakConnectionList::iterator it = _connections.begin();
-      it != _connections.end();)
+      it != _connections.end(); it++)
     {
         TcpConnection::TcpConnectionPtr conn = it->lock();
         if(conn){
             Node* node = std::any_cast<Node>(conn->getContext());
-            double age = TimeStamp::timeDifference(now, node->lastReciveTime) / 1000;
-            if(age > _idleSeconds){
+            double age = timeDifference(now, node->lastReciveTime);
+            if(age > _idleMilliSeconds){
                 if(conn->connected()){
                     conn->close();
                     LOG_INFO << "关闭连接: " << conn->name();

@@ -10,10 +10,20 @@ int createTimerfd()
     return fd;
 }
 
-void resetTimerfd(int timerfd, TimeStamp when)
+time_t howmuchTimeFromNow(Time when)
+{
+    int64_t ms = timeDifference(when, Time::now());
+    if(ms < 100){
+        ms = 100;
+    }
+    return static_cast<time_t>(ms / 1000);
+}
+
+void resetTimerfd(int timerfd, Time when)
 {
     struct itimerspec newValue;
-    newValue.it_value.tv_sec = TimeStamp::timeDifference(when, TimeStamp::now()) / 1000;
+    memset(&newValue, 0, sizeof(newValue));
+    newValue.it_value.tv_sec = howmuchTimeFromNow(when);
     if(timerfd_settime(timerfd, 0, &newValue, nullptr) == -1){
         LOG_ERROR << "timerfd_settime error";
     }
@@ -42,7 +52,7 @@ TimerQueue::~TimerQueue()
 
 }
 
-void TimerQueue::addTimer(TimeStamp when, double interval, Timer::TimeCallback cb)
+void TimerQueue::addTimer(Time when, int interval, Timer::TimeCallback cb)
 {   
     Timer* timer = new Timer(when, interval, std::move(cb)); 
     _loop->runInLoop(std::bind(&TimerQueue::addTimerInLoop, this, timer));
@@ -61,7 +71,7 @@ void TimerQueue::handleRead()
 {
     _loop->assertInLoopThread();
     readTimerfd(_timerfd);
-    TimeStamp now(TimeStamp::now());
+    Time now(Time::now());
     std::vector<Entry> expired = _getExpired(now);
 
     for(const Entry& expire : expired){
@@ -75,7 +85,7 @@ bool TimerQueue::_addTimer(Timer* timer)
 {
     _loop->assertInLoopThread();
     bool earliestChanged = false;
-    TimeStamp when = timer->expiration();
+    Time when = timer->expiration();
     TimerList::iterator it = _timers.begin();
     if(it == _timers.end() || when < it->first){
         earliestChanged = true;
@@ -85,7 +95,7 @@ bool TimerQueue::_addTimer(Timer* timer)
     return earliestChanged;
 }
 
-std::vector<TimerQueue::Entry> TimerQueue::_getExpired(TimeStamp now)
+std::vector<TimerQueue::Entry> TimerQueue::_getExpired(Time now)
 {
     std::vector<Entry> expired;
     Entry sentry = std::make_pair(now, reinterpret_cast<Timer*>(UINTPTR_MAX));
@@ -97,9 +107,9 @@ std::vector<TimerQueue::Entry> TimerQueue::_getExpired(TimeStamp now)
     return expired;
 }
 
-void TimerQueue::_reset(const std::vector<TimerQueue::Entry>& expired, TimeStamp now)
+void TimerQueue::_reset(const std::vector<TimerQueue::Entry>& expired, Time now)
 {
-    TimeStamp nextExpire;
+    Time nextExpire;
 
     for(const Entry& it : expired){
         if(it.second->isRepeat()){

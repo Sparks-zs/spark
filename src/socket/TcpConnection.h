@@ -20,7 +20,7 @@ public:
 
     typedef std::shared_ptr<TcpConnection> TcpConnectionPtr;
     typedef std::function<void(const TcpConnectionPtr&)> ConnectionCallback;
-    typedef std::function<void(const TcpConnectionPtr&, Buffer*, TimeStamp)> ReadCallback;
+    typedef std::function<void(const TcpConnectionPtr&, Buffer*, Time)> ReadCallback;
     typedef std::function<void(const TcpConnectionPtr&)> WriteCallback;
     typedef std::function<void(const TcpConnectionPtr&)> CloseCallback;
 

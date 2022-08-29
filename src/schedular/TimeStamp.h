@@ -7,49 +7,53 @@
 
 typedef std::chrono::high_resolution_clock Clock;
 typedef std::chrono::milliseconds MS;
+typedef std::chrono::time_point<Clock, MS> MS_TimePoint;
 
-class TimeStamp
+class Time
 {
 public:
 
-    TimeStamp(Clock::time_point time);
-    TimeStamp(){}
-    ~TimeStamp();
+    Time(MS_TimePoint time)
+        : _timePoint(time) {}
+    Time(){}
 
-    // bool operator<(TimeStamp t){
-    //     return _expires < t._expires;
-    // }
-
-    // bool operator==(TimeStamp t){
-    //     return _expires == t._expires;
-    // }
-
-    static TimeStamp now(){
-        return TimeStamp(Clock::now());
+    MS_TimePoint time(){
+        return _timePoint; 
     }
 
-    void adjust(Clock::time_point t)
-    {
-        _expires = t;
+    void reset(MS_TimePoint t){
+        _timePoint = t; 
     }
 
-    Clock::time_point expiration() { return _expires; }
+    static Time now(){
+        return Time(std::chrono::time_point_cast<MS>(Clock::now()));
+    }
 
-    TimeStamp& addTime(int ms);
-    TimeStamp& addTime(const TimeStamp& t);
-    static int timeDifference(TimeStamp high, TimeStamp low);
+    Time& operator+(int ms){
+        _timePoint += MS(ms);
+        return *this;
+    }
 
-private:
-    Clock::time_point _expires;
+    Time& operator+(Time t){
+        _timePoint += MS(_timePoint - t.time());
+        return *this;
+    }
+
+private:    
+    MS_TimePoint _timePoint;
 };
 
-inline bool operator<(TimeStamp lhs, TimeStamp rhs){
-    return lhs.expiration() < rhs.expiration();
+inline bool operator<(Time lhs, Time rhs){
+    return lhs.time() < rhs.time();
 }
 
-inline bool operator==(TimeStamp lhs, TimeStamp rhs){
-    return lhs.expiration() == rhs.expiration();
+inline bool operator==(Time lhs, Time rhs){
+    return lhs.time() == rhs.time();
 }
 
+inline int64_t timeDifference(Time high, Time low)
+{
+    return (high.time() - low.time()).count();
+}
 
 #endif // TIME_H

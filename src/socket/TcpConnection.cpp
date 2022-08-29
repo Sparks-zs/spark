@@ -66,7 +66,7 @@ void TcpConnection::handelRead()
     ssize_t n = _readBuffer.readFd(_channel.fd(), &saveErr);
     LOG_DEBUG << _name << " readed " << n << " bytes";
     if(n > 0){
-        _readCallback(shared_from_this(), &_readBuffer, TimeStamp::now());
+        _readCallback(shared_from_this(), &_readBuffer, Time::now());
     }
     else if(n == 0){
         handleClose();
