@@ -13,8 +13,8 @@ int createTimerfd()
 time_t howmuchTimeFromNow(Time when)
 {
     int64_t ms = timeDifference(when, Time::now());
-    if(ms < 100){
-        ms = 100;
+    if(ms < 1000){
+        ms = 1000;
     }
     return static_cast<time_t>(ms / 1000);
 }
@@ -31,8 +31,8 @@ void resetTimerfd(int timerfd, Time when)
 
 void readTimerfd(int timerfd)
 {
-    uint16_t howmany;
-    ssize_t n = read(timerfd, &howmany, sizeof howmany);
+    uint64_t howmany;
+    ssize_t n = read(timerfd, &howmany, sizeof(howmany));
     if(n == -1){
         LOG_ERROR << "readTimerfd error";
     }

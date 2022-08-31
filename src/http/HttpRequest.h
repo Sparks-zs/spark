@@ -18,16 +18,17 @@ public:
         FINISH,        
     };
 
-
     HttpRequest();
     ~HttpRequest();
 
     void init();
     bool parse(Buffer* buff);
-    std::string getHeader(const std::string& field) const;
 
     int codeStatus() { return _code; }
-    std::string getPath() { return _path; }
+
+    std::string getMethod() const { return _method; }
+    std::string getPath() const { return _path; }
+    std::string getHeader(const std::string& field) const;
 
 private:
     bool _parseRequestLine(const std::string& line);

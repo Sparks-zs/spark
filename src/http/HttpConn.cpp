@@ -1,8 +1,7 @@
 #include "HttpConn.h"
 #include "HTTP.h"
 
-HttpConn::HttpConn(const std::string& cwd)
-    : _cwd(cwd)
+HttpConn::HttpConn()
 {
 }
 
@@ -17,9 +16,8 @@ bool HttpConn::parse(Buffer* buff)
     if(!_request.parse(buff)){
         return false;
     }
-
-    _response.setPath(_cwd + _request.getPath());
     _response.setCodeState(_request.codeStatus());
+    if(_handleCallback) _handleCallback(_request, _response, _request.getMethod());
 
     return true;
 }

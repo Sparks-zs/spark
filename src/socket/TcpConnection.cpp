@@ -18,7 +18,6 @@ TcpConnection::~TcpConnection()
     if(_state != DisConnected){
         LOG_DEBUG << _name << "处于连接状态, 但正在析构";
     }
-    LOG_DEBUG << _name << "正在析构";
 }
 
 void TcpConnection::start()

@@ -1,5 +1,4 @@
 #include "HttpResponse.h"
-#include "../buffer/Buffer.h"
 #include "HTTP.h"
 
 using namespace std;
@@ -17,35 +16,33 @@ HttpResponse::~HttpResponse()
 
 void HttpResponse::init()
 {
-    _responseContent.retrieveAll();
+    _writeBuffer.retrieveAll();
 }
 
 void HttpResponse::makeResponse()
 {
     init();
     _addStateLine();
-    Buffer buff;
 
     switch(_code){
     case OK:
-        _fileManager.readToBuffer(_path, &buff);
         _addHeader("Connection", "keep-alive");
-        _addHeader("Content-Type", _fileManager.type());
-        _addHeader("Content-Length", to_string(_fileManager.size()));
+        _addHeader("Content-Length", to_string(_content.readableBytes()));
+        _addHeader("Content-Type", _type);
         break;
     case BAD_REQUEST:
     case FORBIDDEN:
     case NOT_FOUND:
     case METHOD_NOT_ALLOWED:
-        buff.append("Return Nothing");
+        _content.append("Return Nothing");
+        _addHeader("Content-Length", to_string(_content.readableBytes()));
         _addHeader("Content-Type", "text/plain");
-        _addHeader("Content-Length", to_string(buff.readableBytes()));
         break;
     default:
         break;
     }
 
-    _addBody(buff);
+    _addBody();
 }
 
 void HttpResponse::setCodeState(int code)
@@ -60,18 +57,18 @@ void HttpResponse::setCodeState(int code)
 void HttpResponse::_addStateLine()
 {
     string line = "HTTP/1.1 " + to_string(_code) + " " +  HTTP_CODE_REASON.find(_code)->second + "\r\n";
-    _responseContent.append(line);
+    _writeBuffer.append(line);
 }
 
 void HttpResponse::_addHeader(const std::string& head, const std::string& field)
 {
     string header = head + ": " + field + "\r\n";
-    _responseContent.append(header);
+    _writeBuffer.append(header);
 }
 
-void HttpResponse::_addBody(const Buffer& buff)
+void HttpResponse::_addBody()
 {
-    _responseContent.append("\r\n");
-    _responseContent.append(buff);
+    _writeBuffer.append("\r\n");
+    _writeBuffer.append(_content);
 }
 
