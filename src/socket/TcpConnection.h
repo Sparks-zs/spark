@@ -2,6 +2,7 @@
 #define TCPCONNECTION_H
 
 #include <any>
+#include <memory.h>
 
 #include "Socket.h"
 #include "./Channel.h"
@@ -20,7 +21,7 @@ public:
 
     typedef std::shared_ptr<TcpConnection> TcpConnectionPtr;
     typedef std::function<void(const TcpConnectionPtr&)> ConnectionCallback;
-    typedef std::function<void(const TcpConnectionPtr&, Buffer*, Time)> ReadCallback;
+    typedef std::function<void(const TcpConnectionPtr&, Buffer*, TimeStamp)> ReadCallback;
     typedef std::function<void(const TcpConnectionPtr&)> WriteCallback;
     typedef std::function<void(const TcpConnectionPtr&)> CloseCallback;
 
@@ -72,9 +73,9 @@ public:
 private:
     void _closeInLoop();
 
-    Socket* _socket;
     EventLoop* _loop;
-    Channel _channel;
+    std::unique_ptr<Socket> _socket;
+    std::unique_ptr<Channel> _channel;
     ConnState _state;
     std::string _name;
 

@@ -19,7 +19,7 @@ public:
     void start();
 
     void onConnection(const TcpConnection::TcpConnectionPtr& conn);
-    void onRead(const TcpConnection::TcpConnectionPtr& conn, Buffer* buf, Time time);
+    void onRead(const TcpConnection::TcpConnectionPtr& conn, Buffer* buf, TimeStamp time);
     void onTimer();
 
     void Get(std::string url, HttpCallback cb){
@@ -34,7 +34,7 @@ private:
     void _handle(const HttpRequest& requeset, HttpResponse& response, Handler handler);
     typedef std::list<std::weak_ptr<TcpConnection>> WeakConnectionList;
     struct Node{
-        Time lastReciveTime;
+        TimeStamp lastReciveTime;
         WeakConnectionList::iterator poistion;
         HttpConn http;
     };

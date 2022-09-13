@@ -24,7 +24,7 @@ void HttpServer::onConnection(const TcpConnection::TcpConnectionPtr& conn)
 {
     if(conn->connected()){
         Node node;
-        node.lastReciveTime = Time::now();
+        node.lastReciveTime = TimeStamp::now();
         node.http = HttpConn();
         node.http.setHandleCallback(std::bind(&HttpServer::_onHandle, this,
            std::placeholders::_1, std::placeholders::_2, std::placeholders::_3));    // 设置回调，处理用户任务
@@ -34,7 +34,7 @@ void HttpServer::onConnection(const TcpConnection::TcpConnectionPtr& conn)
     }
 }
 
-void HttpServer::onRead(const TcpConnection::TcpConnectionPtr& conn, Buffer* buff, Time time)
+void HttpServer::onRead(const TcpConnection::TcpConnectionPtr& conn, Buffer* buff, TimeStamp time)
 {
     Node* node = std::any_cast<Node>(conn->getContext());
     node->lastReciveTime = time;
@@ -45,9 +45,9 @@ void HttpServer::onRead(const TcpConnection::TcpConnectionPtr& conn, Buffer* buf
     }
 }
 
-void HttpServer::onTimer()      // 每隔idleSeconds检测一次连接是否超时
+void HttpServer::onTimer()      // 每隔idleMilliSeconds检测一次连接是否超时
 {
-    Time now = Time::now();
+    TimeStamp now = TimeStamp::now();
     for (WeakConnectionList::iterator it = _connections.begin();
       it != _connections.end(); it++)
     {

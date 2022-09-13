@@ -31,7 +31,7 @@ private:
 class Socket : public std::enable_shared_from_this<Socket>
 {
 public:
-    explicit Socket(int socketFd) : m_socket(socketFd) {}
+    explicit Socket(int socketFd) : _socket(socketFd) {}
     ~Socket();
 
     bool bind(Address address);
@@ -39,12 +39,12 @@ public:
     int accept();
     void close();
 
-    int fd() { return m_socket; }
+    int fd() { return _socket; }
     bool setsockopt(int level, int optname, const void* optval, socklen_t optlen);
     void setFdNonblock();
 
 private:
-    int m_socket = -1;
+    int _socket;
 };
 
 

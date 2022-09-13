@@ -33,7 +33,7 @@ Socket::~Socket()
 
 bool Socket::bind(Address address)
 {
-    int ret = ::bind(m_socket, address.getSockaddr(), 
+    int ret = ::bind(_socket, address.getSockaddr(), 
                     static_cast<socklen_t>(sizeof(struct sockaddr_in)));
     if(ret < 0){
         LOG_ERROR << "socket bind error";
@@ -44,7 +44,7 @@ bool Socket::bind(Address address)
 
 bool Socket::listen(int maxConn)
 {
-    int ret = ::listen(m_socket, maxConn);
+    int ret = ::listen(_socket, maxConn);
     if(ret < 0){
         close();
         LOG_ERROR << "socket listen error";
@@ -58,7 +58,7 @@ int Socket::accept()
     struct sockaddr_in addr;
     socklen_t len = sizeof(addr);
 
-    int connfd = ::accept(m_socket, (struct sockaddr *)&addr, &len);
+    int connfd = ::accept(_socket, (struct sockaddr *)&addr, &len);
     if(connfd <= 0){
         LOG_ERROR << "socket accpet error";
         return -1;
@@ -68,7 +68,7 @@ int Socket::accept()
 
 bool Socket::setsockopt(int level, int optname, const void* optval, socklen_t optlen)
 {
-    int ret = ::setsockopt(m_socket, level, optname, optval, optlen);
+    int ret = ::setsockopt(_socket, level, optname, optval, optlen);
     if(ret == -1) {
         close();
         LOG_ERROR << "set socket setsockopt error";
@@ -79,10 +79,10 @@ bool Socket::setsockopt(int level, int optname, const void* optval, socklen_t op
 
 void Socket::close()
 {
-    ::close(m_socket);
+    ::close(_socket);
 }
 
 void Socket::setFdNonblock()
 {
-    assert(fcntl(m_socket, F_SETFL, fcntl(m_socket, F_GETFD, 0) | O_NONBLOCK) >= 0);
+    assert(fcntl(_socket, F_SETFL, fcntl(_socket, F_GETFD, 0) | O_NONBLOCK) >= 0);
 }

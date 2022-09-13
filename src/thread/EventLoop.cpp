@@ -3,6 +3,7 @@
 #include "../socket/Channel.h"
 
 __thread EventLoop* t_loopInThisThread = 0;
+const int kPollTimeMs = 10000;
 
 EventLoop::EventLoop()
     : _isLooping(false), _quit(true),
@@ -44,11 +45,9 @@ void EventLoop::loop()
     _isLooping = true;
     _quit = false;
 
-    int timeMs = -1;
-
     while(!_quit){
         _activeChannels.clear();
-        _epoller->poll(&_activeChannels, timeMs);
+        _epoller->poll(&_activeChannels, kPollTimeMs);
         for(ChannelList::iterator iter = _activeChannels.begin();
             iter != _activeChannels.end(); iter++){
             (*iter)->handleEvent();
@@ -105,7 +104,7 @@ void EventLoop::queueInLoop(const Functor& cb)
 
 void EventLoop::runEvery(int interval, Timer::TimeCallback cb)
 {
-    Time time(Time::now() + interval);
+    TimeStamp time(TimeStamp::now() + interval);
     _timerQueue->addTimer(time, interval, cb);
 }
 

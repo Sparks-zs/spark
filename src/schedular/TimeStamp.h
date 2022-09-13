@@ -9,13 +9,13 @@ typedef std::chrono::high_resolution_clock Clock;
 typedef std::chrono::milliseconds MS;
 typedef std::chrono::time_point<Clock, MS> MS_TimePoint;
 
-class Time
+class TimeStamp
 {
 public:
 
-    Time(MS_TimePoint time)
+    TimeStamp(MS_TimePoint time)
         : _timePoint(time) {}
-    Time(){}
+    TimeStamp(){}
 
     MS_TimePoint time(){
         return _timePoint; 
@@ -25,16 +25,16 @@ public:
         _timePoint = t; 
     }
 
-    static Time now(){
-        return Time(std::chrono::time_point_cast<MS>(Clock::now()));
+    static TimeStamp now(){
+        return TimeStamp(std::chrono::time_point_cast<MS>(Clock::now()));
     }
 
-    Time& operator+(int ms){
+    TimeStamp& operator+(int ms){
         _timePoint += MS(ms);
         return *this;
     }
 
-    Time& operator+(Time t){
+    TimeStamp& operator+(TimeStamp t){
         _timePoint += MS(_timePoint - t.time());
         return *this;
     }
@@ -43,15 +43,15 @@ private:
     MS_TimePoint _timePoint;
 };
 
-inline bool operator<(Time lhs, Time rhs){
+inline bool operator<(TimeStamp lhs, TimeStamp rhs){
     return lhs.time() < rhs.time();
 }
 
-inline bool operator==(Time lhs, Time rhs){
+inline bool operator==(TimeStamp lhs, TimeStamp rhs){
     return lhs.time() == rhs.time();
 }
 
-inline int64_t timeDifference(Time high, Time low)
+inline int64_t timeDifference(TimeStamp high, TimeStamp low)
 {
     return (high.time() - low.time()).count();
 }

@@ -33,11 +33,12 @@ public:
     }
 
     void removeConnection(const TcpConnection::TcpConnectionPtr& conn);
-
+    void removeConnectionInLoop(const TcpConnection::TcpConnectionPtr& conn);
+    
     static void defaultConnectionCallback(const TcpConnection::TcpConnectionPtr& conn){
 
     }
-    static void defaultReadCallback(const TcpConnection::TcpConnectionPtr& conn, Buffer* buff, Time time){
+    static void defaultReadCallback(const TcpConnection::TcpConnectionPtr& conn, Buffer* buff, TimeStamp time){
         
     }
     static void defaultWriteCallback(const TcpConnection::TcpConnectionPtr& conn){

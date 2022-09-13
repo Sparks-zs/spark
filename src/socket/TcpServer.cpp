@@ -22,7 +22,6 @@ TcpServer::~TcpServer()
 
 void TcpServer::start()
 {   
-    LOG_DEBUG << "TcpServer start!";
     assert(!_accpetor->isListening());
     _ioLoops->start();
     _loop->runInLoop(std::bind(&Accpetor::listen, _accpetor));
@@ -54,12 +53,18 @@ void TcpServer::newConnection(int clientFd)
     conn->setWriteCallback(_writeCallback);
     conn->setCloseCallback(std::bind(&TcpServer::removeConnection, this, std::placeholders::_1));
     ioLoop->runInLoop(std::bind(&TcpConnection::connectionEstablished, conn));
-    LOG_DEBUG << "建立新连接: " << clientFd;
 }
 
 void TcpServer::removeConnection(const TcpConnection::TcpConnectionPtr& conn)
 {
+    _loop->runInLoop(std::bind(&TcpServer::removeConnectionInLoop, this, conn));
+}
+
+void TcpServer::removeConnectionInLoop(const TcpConnection::TcpConnectionPtr& conn)
+{
+    _loop->assertInLoopThread();
     _connections.erase(conn);
     EventLoop *ioLoop = conn->getLoop();
-    ioLoop->queueInLoop(std::bind(&TcpConnection::destroy, conn));
+    ioLoop->runInLoop(std::bind(&TcpConnection::destroy, conn));
+
 }

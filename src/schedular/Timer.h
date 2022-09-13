@@ -9,20 +9,20 @@ class Timer
 {
 public:
     typedef std::function<void()> TimeCallback;
-    Timer(Time when, int interval, const TimeCallback& cb)
+    Timer(TimeStamp when, int interval, const TimeCallback& cb)
         : _expiration(when),
           _interval(interval),
           _cb(cb)
     {}
 
-    Time expiration() { return _expiration; }
+    TimeStamp expiration() { return _expiration; }
     bool isRepeat() { return _interval > 0.0; }
     void run() { if(_cb) _cb(); }
 
-    void restart(Time now);
+    void restart(TimeStamp now);
 
 private:
-    Time _expiration;
+    TimeStamp _expiration;
     int _interval;
     const TimeCallback _cb;
 
