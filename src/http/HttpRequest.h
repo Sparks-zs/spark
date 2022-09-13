@@ -25,6 +25,12 @@ public:
     bool parse(Buffer* buff);
 
     int codeStatus() { return _code; }
+    bool isKeepAlive(){ 
+        if(_headers.count("Connection")){
+            return _headers.find("Connection")->second == "keep-alive" && _version == "1.1";
+        }
+        return false;
+    }
 
     std::string getMethod() const { return _method; }
     std::string getPath() const { return _path; }
@@ -43,7 +49,6 @@ private:
     std::string _method, _path, _version, _body;
     std::unordered_map<std::string, std::string> _headers;
     std::unordered_map<std::string, std::string> _post;
-    
 };
 
 

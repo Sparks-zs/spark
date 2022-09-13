@@ -54,6 +54,7 @@ void TcpServer::newConnection(int clientFd)
     conn->setWriteCallback(_writeCallback);
     conn->setCloseCallback(std::bind(&TcpServer::removeConnection, this, std::placeholders::_1));
     ioLoop->runInLoop(std::bind(&TcpConnection::connectionEstablished, conn));
+    LOG_DEBUG << "建立新连接: " << clientFd;
 }
 
 void TcpServer::removeConnection(const TcpConnection::TcpConnectionPtr& conn)

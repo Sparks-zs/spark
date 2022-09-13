@@ -17,6 +17,7 @@ bool HttpConn::parse(Buffer* buff)
         return false;
     }
     _response.setCodeState(_request.codeStatus());
+    _response.setKeepAlive(_request.isKeepAlive());
     if(_handleCallback) _handleCallback(_request, _response, _request.getMethod());
 
     return true;

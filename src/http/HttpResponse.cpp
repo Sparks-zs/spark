@@ -4,7 +4,7 @@
 using namespace std;
 
 HttpResponse::HttpResponse()
-    : _code(-1)
+    : _code(-1), _isKeepAlive(false)
 {
 
 }
@@ -23,10 +23,15 @@ void HttpResponse::makeResponse()
 {
     init();
     _addStateLine();
-
+    
     switch(_code){
     case OK:
-        _addHeader("Connection", "keep-alive");
+        if(_isKeepAlive) {
+            _addHeader("Connection", "keep-alive");
+            _addHeader("keep-alive", "max=6, timeout=120");
+        } else{
+            _addHeader("Connection", "close");
+        }
         _addHeader("Content-Length", to_string(_content.readableBytes()));
         _addHeader("Content-Type", _type);
         break;
