@@ -64,4 +64,6 @@ void* Thread::run(void* obj)
 {
     Thread* thread = (Thread*)obj;
     thread->m_cb();
+    
+    return nullptr;
 }

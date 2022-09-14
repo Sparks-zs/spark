@@ -7,19 +7,15 @@
 #ifndef LOG_H
 #define LOG_H
 
-#include <mutex>
 #include <string>
 #include <ctime>
 #include <sys/time.h>
-#include <string.h>
-#include <stdarg.h>           // vastart va_end
 #include <assert.h>
 #include <sys/stat.h>         //mkdir
 #include <iostream>
-#include<iomanip>
+#include<iomanip>       // setfill
 #include <fstream>
 #include <sstream>
-#include <condition_variable>
 
 #include "BlockQueue.h"
 

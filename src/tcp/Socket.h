@@ -7,11 +7,10 @@
 #include <netinet/in.h> // 字节序转换
 #include <unistd.h>     // 连接关闭
 #include <fcntl.h>
-#include <string>
 
-#include "../log/Log.h"
-#include "./SocketsOps.h"
-#include "../buffer/Buffer.h"
+#include "SocketsOps.h"
+#include "src/log/Log.h"
+#include "src/buffer/Buffer.h"
 
 class Address
 {

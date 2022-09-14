@@ -1,17 +1,8 @@
 #ifndef EVENTLOOP_H
 #define EVENTLOOP_H
 
-#include <vector>
-#include <assert.h>
-#include <stdio.h>
-#include <memory>
-#include <mutex>
-#include <functional>
-#include <sys/eventfd.h>
-
-#include "../log/Log.h"
 #include "CurrentThread.h"
-#include "../schedular/TimerQueue.h"
+#include "src/timer/TimerQueue.h"
 
 class Channel;
 class Epoller;

@@ -3,9 +3,8 @@
 
 #include "Socket.h"
 #include "Channel.h"
-#include "../thread/EventLoop.h"
 
-#include <functional>
+class EventLoop;
 
 class Accpetor
 {

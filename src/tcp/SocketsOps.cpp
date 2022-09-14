@@ -1,4 +1,5 @@
 #include "SocketsOps.h"
+#include <sys/socket.h>
 
 int createSocket()
 {

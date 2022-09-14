@@ -2,18 +2,14 @@
 #define FILEMANAGER_H
 
 #include <fcntl.h>       // open
+#include <dirent.h>   
 #include <unistd.h>      // close
-#include <sys/stat.h>    // stat
+#include <string.h>
 #include <sys/mman.h>    // mmap, unmap
-#include <dirent.h>     
-#include <fstream>
-#include <iostream>
-#include <string>
-#include <vector>
 #include <unordered_map>
 
-#include "../log/Log.h"
-#include "../buffer/Buffer.h"
+#include "src/log/Log.h"
+#include "src/buffer/Buffer.h"
 
 class FileManager
 {

@@ -1,15 +1,6 @@
 #ifndef THREADPOOL_H
 #define THREADPOOL_H
 
-#include <deque>
-#include <vector>
-#include <memory>
-#include <functional>
-#include <mutex>
-#include <condition_variable>
-#include <assert.h>
-#include <string>
-
 #include "thread.h"
 
 class ThreadPool

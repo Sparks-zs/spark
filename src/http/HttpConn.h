@@ -1,12 +1,10 @@
 #ifndef HTTPCONN_H
 #define HTTPCONN_H
 
-#include <unordered_map>
 #include <functional>
 
 #include "HttpRequest.h"
 #include "HttpResponse.h"
-#include "../buffer/Buffer.h"
 
 class HttpConn
 {

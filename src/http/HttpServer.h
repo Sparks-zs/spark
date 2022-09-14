@@ -3,9 +3,9 @@
 
 #include <list>
 
-#include "../socket/TcpConnection.h"
-#include "../socket/TcpServer.h"
-#include "../schedular/TimerQueue.h"
+#include "src/tcp/TcpConnection.h"
+#include "src/tcp/TcpServer.h"
+#include "src/timer/TimerQueue.h"
 
 class HttpServer
 {

@@ -1,13 +1,9 @@
 #ifndef THREAD_H
 #define THREAD_H
-
-#include <string>
 #include <functional>
-#include <pthread.h>
-#include <sys/syscall.h>
 
 #include "CurrentThread.h"
-#include "../log/Log.h"
+#include "src/log/Log.h"
 
 class Thread
 {

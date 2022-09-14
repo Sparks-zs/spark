@@ -4,12 +4,13 @@
 #include <set>
 #include <memory>
 #include <vector>
+#include <string.h>
 #include <unistd.h>
 #include <sys/timerfd.h>
 
 #include "Timer.h"
-#include "../log/Log.h"
-#include "../socket/Channel.h"
+#include "src/log/Log.h"
+#include "src/tcp/Channel.h"
 
 class EventLoop;
 

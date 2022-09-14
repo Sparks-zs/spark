@@ -9,7 +9,6 @@
 #include <mutex>
 #include <deque>
 #include <condition_variable>
-#include <sys/time.h>
 
 template<class T>
 class BlockDeque {

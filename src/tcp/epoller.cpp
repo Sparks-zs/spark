@@ -1,5 +1,5 @@
 #include "epoller.h"
-#include "../socket/Channel.h"
+#include "Channel.h"
 
 #include <stdio.h>
 #include <sys/epoll.h>
@@ -24,7 +24,7 @@ Epoller::~Epoller()
 
 }
 
-int Epoller::poll(ChannelList* activeChannels, int timeoutMs)
+void Epoller::poll(ChannelList* activeChannels, int timeoutMs)
 {
     int numEvents = epoll_wait(_epollfd,
                                _events.data(),

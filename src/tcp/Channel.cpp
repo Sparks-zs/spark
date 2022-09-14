@@ -1,5 +1,5 @@
 #include "Channel.h"
-#include "../thread/EventLoop.h"
+#include "src/thread/EventLoop.h"
 #include <sys/epoll.h>
 
 const int Channel::kNoneEvent = 0;

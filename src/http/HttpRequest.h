@@ -2,10 +2,10 @@
 #define HTTPREQUEST_H
 
 #include <unordered_map>
-#include <string>
-#include "../buffer/Buffer.h"
-#include "../log/Log.h"
-#include "../http/HTTP.h"
+
+#include "src/buffer/Buffer.h"
+#include "src/log/Log.h"
+#include "HTTP.h"
 
 class HttpRequest
 {

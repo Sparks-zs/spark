@@ -2,13 +2,11 @@
 #define TCPCONNECTION_H
 
 #include <any>
-#include <memory.h>
 
 #include "Socket.h"
-#include "./Channel.h"
-#include "../buffer/Buffer.h"
-#include "../thread/EventLoop.h"
-#include "../http/HttpConn.h"
+#include "Channel.h"
+#include "src/thread/EventLoop.h"
+#include "src/http/HttpConn.h"
 
 class TcpConnection : public std::enable_shared_from_this<TcpConnection>
 {

@@ -1,5 +1,5 @@
 #include "Log.h"
-#include "../thread/thread.h"
+#include "src/thread/thread.h"
 
 using namespace std;
 

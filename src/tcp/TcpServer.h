@@ -1,12 +1,10 @@
 #ifndef TCPSERVER_H
 #define TCPSERVER_H
 
-#include "./TcpConnection.h"
-#include "./Accpetor.h"
-#include "../thread/EventLoop.h"
+#include "TcpConnection.h"
+#include "Accpetor.h"
+#include "src/thread/EventLoop.h"
 
-#include <functional>
-#include <vector>
 #include <set>
 
 class EventLoopThreadPool;

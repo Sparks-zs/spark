@@ -18,7 +18,7 @@ public:
     Epoller(EventLoop* loop);
     ~Epoller();
 
-    int poll(ChannelList* activeChannels, int timeoutMs=-1);
+    void poll(ChannelList* activeChannels, int timeoutMs=-1);
 
     void updateChannel(Channel* channel);
     void removeChannel(Channel* channel);
