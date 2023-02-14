@@ -3,7 +3,7 @@
 #include <functional>
 
 #include "CurrentThread.h"
-#include "src/log/Log.h"
+#include "Log.h"
 
 class Thread
 {

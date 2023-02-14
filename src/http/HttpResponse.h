@@ -1,8 +1,8 @@
 #ifndef HTTPRESPONSE_H
 #define HTTPRESPONSE_H
 
-#include "src/buffer/Buffer.h"
-#include "src/log/Log.h"
+#include "Buffer.h"
+#include "Log.h"
 
 class Buffer;
 

@@ -128,7 +128,9 @@ bool HttpRequest::_parseRequestBody(const string& body)
 
 void HttpRequest::_parsePath()
 {
-    _path = "/home.html";
+    if(_path == "/"){
+        _path = "/index.html"; 
+    }
 }
 
 void HttpRequest::_parsePost()

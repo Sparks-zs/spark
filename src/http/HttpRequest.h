@@ -3,8 +3,8 @@
 
 #include <unordered_map>
 
-#include "src/buffer/Buffer.h"
-#include "src/log/Log.h"
+#include "Buffer.h"
+#include "Log.h"
 #include "HTTP.h"
 
 class HttpRequest

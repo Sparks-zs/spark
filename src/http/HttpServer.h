@@ -3,9 +3,10 @@
 
 #include <list>
 
-#include "src/tcp/TcpConnection.h"
-#include "src/tcp/TcpServer.h"
-#include "src/timer/TimerQueue.h"
+#include "TcpConnection.h"
+#include "TcpServer.h"
+#include "TimerQueue.h"
+#include "HttpConn.h"
 
 class HttpServer
 {
@@ -13,7 +14,7 @@ public:
     typedef std::function<void(const HttpRequest&, HttpResponse&)> HttpCallback;
     typedef std::unordered_map<std::string, HttpCallback> Handler;
 
-    HttpServer(EventLoop* loop, uint16_t port, int idleSeconds = 5000);
+    HttpServer(int16_t port, EventLoop* loop = new EventLoop(), uint idleSeconds = 5000);
     ~HttpServer();
 
     void start();
@@ -35,11 +36,12 @@ private:
     typedef std::list<std::weak_ptr<TcpConnection>> WeakConnectionList;
     struct Node{
         TimeStamp lastReciveTime;
-        WeakConnectionList::iterator poistion;
+        //WeakConnectionList::iterator poistion;
         HttpConn http;
     };
 
     int _idleMilliSeconds;
+    EventLoop* _loop;
     TcpServer _server;
     WeakConnectionList _connections;
 

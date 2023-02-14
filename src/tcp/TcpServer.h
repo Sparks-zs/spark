@@ -2,8 +2,8 @@
 #define TCPSERVER_H
 
 #include "TcpConnection.h"
-#include "Accpetor.h"
-#include "src/thread/EventLoop.h"
+#include "Acceptor.h"
+#include "EventLoop.h"
 
 #include <set>
 

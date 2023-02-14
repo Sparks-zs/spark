@@ -9,8 +9,8 @@
 #include <sys/timerfd.h>
 
 #include "Timer.h"
-#include "src/log/Log.h"
-#include "src/tcp/Channel.h"
+#include "Log.h"
+#include "Channel.h"
 
 class EventLoop;
 

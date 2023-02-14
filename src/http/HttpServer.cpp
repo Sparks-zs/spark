@@ -1,13 +1,15 @@
 #include "HttpServer.h"
 
-HttpServer::HttpServer(EventLoop* loop, uint16_t port, int idleSeconds)
-    : _idleMilliSeconds(idleSeconds) ,_server(TcpServer(loop, port))
+HttpServer::HttpServer(int16_t port, EventLoop* loop, uint idleSeconds)
+    : _idleMilliSeconds(idleSeconds) ,
+      _loop(loop),
+      _server(TcpServer(loop, port))
 {
     _server.setConnectionCallback(std::bind(
         &HttpServer::onConnection, this, std::placeholders::_1));
     _server.setReadCallback(std::bind(
         &HttpServer::onRead, this, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3));
-    loop->runEvery(idleSeconds, std::bind(&HttpServer::onTimer, this));
+    _loop->runEvery(idleSeconds, std::bind(&HttpServer::onTimer, this));
 }
 
 HttpServer::~HttpServer()
@@ -18,6 +20,7 @@ HttpServer::~HttpServer()
 void HttpServer::start()
 {
     _server.start();
+    _loop->loop();
 }
 
 void HttpServer::onConnection(const TcpConnection::TcpConnectionPtr& conn)
@@ -30,7 +33,7 @@ void HttpServer::onConnection(const TcpConnection::TcpConnectionPtr& conn)
            std::placeholders::_1, std::placeholders::_2, std::placeholders::_3));    // 设置回调，处理用户任务
         conn->setContext(node);
         _connections.push_back(conn);
-        node.poistion = --_connections.end();
+        //node.poistion = --_connections.end();
     }
 }
 

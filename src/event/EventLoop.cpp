@@ -1,8 +1,8 @@
 #include <sys/eventfd.h>
 #include "EventLoop.h"
-#include "src/tcp/epoller.h"
-#include "src/tcp/Channel.h"
-#include "src/timer/TimerQueue.h"
+#include "epoller.h"
+#include "Channel.h"
+#include "TimerQueue.h"
 
 __thread EventLoop* t_loopInThisThread = 0;
 const int kPollTimeMs = 10000;

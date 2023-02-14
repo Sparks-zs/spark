@@ -1,5 +1,5 @@
 #include "filemanager.h"
-#include "src/http/HTTP.h"
+#include "HTTP.h"
 
 using namespace std;
 
@@ -16,8 +16,9 @@ FileManager::~FileManager()
 
 void FileManager::readToBuffer(const string& path, Buffer* buff, int from, int to)
 {
+    LOG_DEBUG << "PATH: " << path;
     if(!checkFilePath(path)){
-        LOG_ERROR << "File path is error";
+        LOG_ERROR << path << " is error";
         return;
     }
 
@@ -26,7 +27,7 @@ void FileManager::readToBuffer(const string& path, Buffer* buff, int from, int t
 
     int fileFd = open(_filePath.data(), O_RDONLY);    
     if(fileFd < 0){
-        LOG_ERROR << "File NotFound!";
+        LOG_ERROR << "Such file path: " << _filePath << " not found!";
         return;
     }
 

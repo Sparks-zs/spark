@@ -5,8 +5,7 @@
 
 #include "Socket.h"
 #include "Channel.h"
-#include "src/thread/EventLoop.h"
-#include "src/http/HttpConn.h"
+#include "EventLoop.h"
 
 class TcpConnection : public std::enable_shared_from_this<TcpConnection>
 {

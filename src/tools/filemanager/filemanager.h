@@ -8,8 +8,8 @@
 #include <sys/mman.h>    // mmap, unmap
 #include <unordered_map>
 
-#include "src/log/Log.h"
-#include "src/buffer/Buffer.h"
+#include "Log.h"
+#include "Buffer.h"
 
 class FileManager
 {

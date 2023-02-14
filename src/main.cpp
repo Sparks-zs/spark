@@ -1,12 +1,17 @@
-#include "src/tcp/TcpServer.h"
+#include "HttpServer.h"
+#include "filemanager.h"
 
 int main()
-{
-    EventLoop loop;
-    TcpServer* server = new TcpServer(&loop, 8888);
-    server->start();
+{   
+    LogStream::Instance()->init(0, "../log/");
+    HttpServer server(8888);
+    server.Get("/index.html", [](const HttpRequest& request, HttpResponse& response){
+        Buffer buff;
+        FileManager filemanager;
+        filemanager.readToBuffer("../www" + request.getPath(), &buff);
+        response.setContent(buff, filemanager.type());
+    });
+    server.start();
 
-    loop.loop();
-    
     return 0;
 }

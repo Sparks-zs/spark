@@ -9,8 +9,8 @@
 #include <fcntl.h>
 
 #include "SocketsOps.h"
-#include "src/log/Log.h"
-#include "src/buffer/Buffer.h"
+#include "Log.h"
+#include "Buffer.h"
 
 class Address
 {
