@@ -1,7 +1,7 @@
 add_library(log "")
 
 target_link_libraries(log
-    base 
+    base
 )
 
 target_sources(log
@@ -15,4 +15,13 @@ target_sources(log
 target_include_directories(log
     PUBLIC
         ${CMAKE_CURRENT_LIST_DIR}
+        ../${CMAKE_CURRENT_LIST_DIR}/base
 )
+
+install(TARGETS log DESTINATION lib)
+
+set(HEADERS
+    BlockQueue.h
+    Log.h)
+
+install(FILES ${HEADERS} DESTINATION include/spark)

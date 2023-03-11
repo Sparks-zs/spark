@@ -1,20 +1,16 @@
-add_executable(spark main.cpp)
+# add_executable(spark main.cpp)
 
 add_subdirectory(base)
-add_subdirectory(event)
 add_subdirectory(log)
-add_subdirectory(timer)
 add_subdirectory(http)
 add_subdirectory(tcp)
-add_subdirectory(tools/filemanager)
 
-target_link_libraries(spark
-    PRIVATE
-        base
-        event
-        log
-        timer
-        http
-        tcp
-        filemanager      
-)
+#target_link_libraries(spark
+#    PRIVATE
+#        base
+#        event
+#        log
+#        timer
+#        http
+#        tcp      
+#)

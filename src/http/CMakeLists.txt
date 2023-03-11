@@ -3,8 +3,6 @@ add_library(http "")
 target_link_libraries(http
     log
     tcp
-    timer
-    event
     base
 )
 
@@ -26,3 +24,14 @@ target_include_directories(http
     PUBLIC
         ${CMAKE_CURRENT_LIST_DIR}
 )
+
+install(TARGETS http DESTINATION lib)
+
+set(HEADERS
+    HTTP.h
+    HttpConn.h
+    HttpRequest.h
+    HttpResponse.h
+    HttpServer.h)
+
+install(FILES ${HEADERS} DESTINATION include/spark)

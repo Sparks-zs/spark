@@ -1,5 +1,8 @@
 #include "HttpServer.h"
 #include "filemanager.h"
+#include "spark_json.h"
+
+using namespace SparkJson;
 
 int main()
 {   

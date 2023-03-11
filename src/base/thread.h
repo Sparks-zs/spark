@@ -1,7 +1,6 @@
 #ifndef THREAD_H
 #define THREAD_H
 #include <functional>
-
 #include "CurrentThread.h"
 #include "Log.h"
 

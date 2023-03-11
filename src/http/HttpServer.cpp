@@ -78,7 +78,6 @@ void HttpServer::_onHandle(const HttpRequest& request, HttpResponse& response, c
     else if(method == "POST"){
         _handle(request, response, _postHandler);
     }
- 
 }
 
 void HttpServer::_handle(const HttpRequest& request, HttpResponse& response, Handler handler)

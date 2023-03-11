@@ -3,6 +3,7 @@
 
 #include "CurrentThread.h"
 #include "TimerQueue.h"
+#include "Log.h"
 
 class Channel;
 class Epoller;
