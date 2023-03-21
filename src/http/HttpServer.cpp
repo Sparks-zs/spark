@@ -72,11 +72,21 @@ void HttpServer::onTimer()      // 每隔idleMilliSeconds检测一次连接是�
 
 void HttpServer::_onHandle(const HttpRequest& request, HttpResponse& response, const std::string& method)
 {
+    if(!request.finish()) return;
     if(method == "GET"){
         _handle(request, response, _getHandler);
     }
     else if(method == "POST"){
         _handle(request, response, _postHandler);
+    }
+    else if(method == "PUT"){
+        _handle(request, response, _putHandler);
+    }
+    else if(method == "PATCH"){
+        _handle(request, response, _patchHandler);
+    }
+    else if(method == "DELETE"){
+        _handle(request, response, _delHandler);
     }
 }
 

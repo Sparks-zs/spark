@@ -1,6 +1,7 @@
 #include "HttpRequest.h"
 #include <regex>
 #include <algorithm>
+#include <sstream>
 
 using namespace std;
 
@@ -22,8 +23,12 @@ void HttpRequest::init()
     _path = "";
     _version = "";
     _body = "";
+    _route = "";
+    _frag = "";
     _headers.clear();
     _post.clear();
+    _query.clear();
+    _params.clear();
 }
 
 bool HttpRequest::parse(Buffer* buff)
@@ -39,7 +44,6 @@ bool HttpRequest::parse(Buffer* buff)
         }
         if(_state == REQUEST_BODY) lineEnd = buff->beginWriteConst();
         string line(buff->peek(), lineEnd);
-        LOG_DEBUG << "state: "<< _state << " line: " << line;
 
         switch (_state)
         {
@@ -58,14 +62,11 @@ bool HttpRequest::parse(Buffer* buff)
             _parseRequestBody(line);
             break;
         default:
-            break;
-        }
+            break;        }
 
         if(lineEnd == buff->beginWriteConst()) buff->retrieveUntil(lineEnd);
         else buff->retrieveUntil(lineEnd + 2);
     }
-    LOG_DEBUG << "HTTP解析完毕: method: " << _method << " url: " << _path << \
-                 " version: " << _version << " body: " << _body;
     return true;
 }
 
@@ -117,25 +118,74 @@ bool HttpRequest::_parseRequestBody(const string& body)
         return false;
     }
 
-    _body = body;
+    //_body += body;
     _code = OK;
     _state = FINISH;
 
-    _parsePost();
+    if(getHeader("Content-Type") == "application/x-www-form-urlencoded"){
+        _parseBody();
+    }
 
     return true;
 }
 
 void HttpRequest::_parsePath()
 {
-    if(_path == "/"){
-        _path = "/index.html"; 
+    regex patten("(\\/[^\\?#]*)(\\?([^#]*))?(#(.*))?");
+    smatch subMatch;
+    if(!regex_match(_path, subMatch, patten)){
+        LOG_WARN << "path 解析失败";
+        return;
     }
+    
+    _route = subMatch[1];
+    _frag = subMatch[5];
+
+    vector<string> ret = _splitString(subMatch[3], '&');
+    for(auto& query : ret){
+        vector<string> r = _splitString(query, '=');
+        if(r.size() == 2){
+            _query[r[0]] = r[1];
+        }
+    }
+    LOG_DEBUG << _route << _frag << subMatch[3];
 }
 
-void HttpRequest::_parsePost()
+void HttpRequest::_parseBody()
 {
+    if(_body.empty()){
+        return;
+    }
 
+    size_t size = _body.size();
+    string key, value;
+    bool parse_key = true;
+    for(size_t i = 0; i < size; i++){
+        if(_body[i] == '='){
+            parse_key = false;
+            continue;
+        }
+        if(_body[i] == '&'){
+            parse_key = true;
+            _params[key] = value;
+            key.clear();
+            value.clear();
+            continue;
+        }
+
+        if(parse_key){
+            key += _body[i];
+        }
+        else{
+            value += _body[i];
+        }
+    }
+
+    if(!key.empty() && !value.empty()){
+        _params[key] = value;
+        key.clear();
+        value.clear();
+    }
 }
 
 string HttpRequest::getHeader(const string& field) const
@@ -145,4 +195,35 @@ string HttpRequest::getHeader(const string& field) const
         header = _headers.find(field)->second;
     }
     return header;
+}
+
+string HttpRequest::getParam(const string& key) const
+{
+    string value;
+    if(_params.count(key)){
+        value = _params.find(key)->second;
+    }
+    return value;
+}
+
+string HttpRequest::getQuery(const string& key) const
+{
+    string value;
+    if(_query.count(key)){
+        value = _query.find(key)->second;
+    }
+    return value;
+}
+
+vector<string> HttpRequest::_splitString(const string& str, char delim)
+{
+    stringstream ss(str);
+    string item;
+    vector<string> elems;
+    while (getline(ss, item, delim)) {
+        if (!item.empty()) {
+            elems.push_back(item);
+        }
+    }
+    return elems;
 }

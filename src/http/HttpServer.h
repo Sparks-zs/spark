@@ -23,10 +23,19 @@ public:
     void onRead(const TcpConnection::TcpConnectionPtr& conn, Buffer* buf, TimeStamp time);
     void onTimer();
 
-    void Get(std::string url, HttpCallback cb){
+    void get(std::string url, HttpCallback cb){
         _getHandler[url] = std::move(cb);
     }
-    void Post(std::string url, HttpCallback cb){
+    void post(std::string url, HttpCallback cb){
+        _postHandler[url] = std::move(cb);
+    }
+    void put(std::string url, HttpCallback cb){
+        _postHandler[url] = std::move(cb);
+    }
+    void patch(std::string url, HttpCallback cb){
+        _postHandler[url] = std::move(cb);
+    }
+    void del(std::string url, HttpCallback cb){
         _postHandler[url] = std::move(cb);
     }
 
@@ -47,6 +56,9 @@ private:
 
     Handler _getHandler;
     Handler _postHandler;
+    Handler _putHandler;
+    Handler _patchHandler;
+    Handler _delHandler;
 };
 
 #endif // HTTPSERVER_H
