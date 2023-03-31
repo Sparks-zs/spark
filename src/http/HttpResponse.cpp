@@ -4,7 +4,8 @@
 using namespace std;
 
 HttpResponse::HttpResponse()
-    : _code(-1), _isKeepAlive(false)
+    : _code(-1), _isKeepAlive(false),
+      _type("text/plain")
 {
 
 }
@@ -32,21 +33,19 @@ void HttpResponse::makeResponse()
         } else{
             _addHeader("Connection", "close");
         }
-        _addHeader("Content-Length", to_string(_content.readableBytes()));
-        _addHeader("Content-Type", _type);
         break;
     case BAD_REQUEST:
     case FORBIDDEN:
     case NOT_FOUND:
     case METHOD_NOT_ALLOWED:
-        _content.append("Return Nothing");
-        _addHeader("Content-Length", to_string(_content.readableBytes()));
-        _addHeader("Content-Type", "text/plain");
         break;
     default:
         break;
     }
-
+    
+    _addHeader("Content-Length", to_string(_content.readableBytes()));
+    _addHeader("Content-Type", _type);
+    
     _addBody();
 }
 

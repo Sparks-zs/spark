@@ -148,7 +148,6 @@ void HttpRequest::_parsePath()
             _query[r[0]] = r[1];
         }
     }
-    LOG_DEBUG << _route << _frag << subMatch[3];
 }
 
 void HttpRequest::_parseBody()

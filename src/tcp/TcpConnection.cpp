@@ -15,7 +15,6 @@ TcpConnection::TcpConnection(EventLoop* loop,
 
 TcpConnection::~TcpConnection()
 {
-    LOG_DEBUG << "closing "<< getSocketFd() << " TcpConnection";
     assert(_state == DisConnected);
 }
 
@@ -62,7 +61,6 @@ void TcpConnection::handelRead()
 {
     int saveErr;
     ssize_t n = _readBuffer.readFd(_channel->fd(), &saveErr);
-    LOG_DEBUG << _name << " readed " << n << " bytes";
     if(n > 0){
         _readCallback(shared_from_this(), &_readBuffer, TimeStamp::now());
     }

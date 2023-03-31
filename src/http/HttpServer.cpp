@@ -92,8 +92,8 @@ void HttpServer::_onHandle(const HttpRequest& request, HttpResponse& response, c
 
 void HttpServer::_handle(const HttpRequest& request, HttpResponse& response, Handler handler)
 {
-    if(handler.count(request.getPath())){
-        handler.find(request.getPath())->second(request, response);
+    if(handler.count(request.getRoute())){
+        handler.find(request.getRoute())->second(request, response);
     }
     else{
         response.setCodeState(NOT_FOUND);

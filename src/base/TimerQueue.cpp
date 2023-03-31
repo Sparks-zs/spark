@@ -60,7 +60,6 @@ TimerQueue::~TimerQueue()
 
 void TimerQueue::addTimer(TimeStamp when, int interval, Timer::TimeCallback cb)
 {   
-    LOG_DEBUG << "添加新的定时器";
     Timer* timer = new Timer(when, interval, std::move(cb)); 
     _loop->runInLoop(std::bind(&TimerQueue::addTimerInLoop, this, timer));
 }

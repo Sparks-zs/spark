@@ -11,6 +11,11 @@ class Buffer
 public:
     Buffer(size_t size=4096): m_readPos(0), 
         m_writePos(0), m_buf(size){}
+    
+    Buffer(const std::string& str, size_t size=4096): m_readPos(0), 
+        m_writePos(0), m_buf(size){
+        append(str);
+    }
 
     ~Buffer() = default;
 
@@ -121,11 +126,9 @@ private:
         return m_buf.data();
     }
 
+    // 先删除已读数据，在判断当前可写空间是否足够，不够则继续扩展空间
     void _makeSpace(size_t len){
-        if(len > writeableBytes() + prependableBytes()){
-            m_buf.resize(m_writePos + len);
-        }
-        else{
+        if(m_readPos > 0){
             size_t readable = readableBytes();
             std::copy(_begin() + m_readPos,
                       _begin() + m_writePos,
@@ -133,6 +136,9 @@ private:
             m_readPos = 0;
             m_writePos = m_readPos + readable;
             assert(readable == readableBytes());
+        }
+        if(len > writeableBytes()){
+            m_buf.resize(m_writePos + writeableBytes() + len + 1);
         }
     }
 

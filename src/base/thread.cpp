@@ -17,12 +17,10 @@ Thread::Thread(std::function<void()> cb, const std::string& name)
     if(ret != 0){
         LOG_ERROR << "Failed to create new thread";
     }
-    LOG_DEBUG << "Creating a new thread: "<< m_name.c_str();
 }
 
 Thread::~Thread()
 {
-    LOG_DEBUG << m_name.c_str() << " thread is destructing";
 }
 
 pid_t Thread::gettid() const
@@ -37,13 +35,11 @@ const std::string& Thread::getName() const
 
 void Thread::detach()
 {
-    LOG_DEBUG <<  m_name.c_str() << " thread is running (detach)";
     pthread_detach(m_thread);
 }
 
 void Thread::join()
 {
-    LOG_DEBUG <<  m_name.c_str() << " thread is running (join)";
     int ret = pthread_join(m_thread, nullptr);
     if(ret != 0){
         switch(ret){

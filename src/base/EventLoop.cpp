@@ -16,7 +16,6 @@ EventLoop::EventLoop()
       _epoller(new Epoller(this)),
       _timerQueue(new TimerQueue(this))
 {
-    LOG_DEBUG << "Eventloop create in thread " << _threadId;
     if(t_loopInThisThread){
         LOG_WARN << "another Eventloop " << t_loopInThisThread << " exist in this thread " << _threadId;
     }
