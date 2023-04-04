@@ -3,6 +3,7 @@
 
 #include "Buffer.h"
 #include "Log.h"
+#include <unordered_map>
 
 class Buffer;
 
@@ -24,15 +25,18 @@ public:
         _content.append(content);
         _type = type;
     }
+    
+    void addHeader(const std::string& header, const std::string& field);
 
 private:
     void _addStateLine();
-    void _addHeader(const std::string& header, const std::string& field);
+    void _addHeader();
     void _addBody();
 
     int _code;
     bool _isKeepAlive;
     std::string _type;
+    std::unordered_map<std::string, std::string> _headers;
     Buffer _content;
     Buffer _writeBuffer;
 };

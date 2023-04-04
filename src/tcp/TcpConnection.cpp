@@ -68,6 +68,7 @@ void TcpConnection::handelRead()
         handleClose();
     }
     else{
+        LOG_ERROR << "readFd err: " << saveErr;
         handleError();
     }
     
@@ -75,11 +76,12 @@ void TcpConnection::handelRead()
 
 void TcpConnection::handelWrite()
 {
-    LOG_DEBUG << "发送的数据: " << _writeBuffer.asString();
+    LOG_DEBUG << "START WRITE";
     if(_channel->isWriting()){
         ssize_t n = write(_channel->fd(),
                           _writeBuffer.peek(),
                           _writeBuffer.readableBytes());
+        LOG_DEBUG << "WRITE FINISHED";
         if(n > 0){
             _writeBuffer.retrieve(n);
             if(_writeBuffer.readableBytes() == 0){
@@ -92,7 +94,8 @@ void TcpConnection::handelWrite()
 
 void TcpConnection::handleError()
 {
-    LOG_ERROR << "sockfd "<< _channel->fd() << " ";
+    LOG_ERROR << "sockfd "<< _channel->fd() << "发生错误";
+    handleClose();
 }
 
 void TcpConnection::handleClose()

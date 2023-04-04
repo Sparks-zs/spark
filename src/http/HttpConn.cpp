@@ -12,7 +12,6 @@ HttpConn::~HttpConn()
 
 bool HttpConn::parse(Buffer* buff)
 {
-    LOG_DEBUG << "待解析的数据: " << buff->asString();
     if(!_request.parse(buff)){
         return false;
     }

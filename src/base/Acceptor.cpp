@@ -6,11 +6,11 @@ Accpetor::Accpetor(EventLoop* loop, const Address& address)
       _acceptChannel(Channel(loop, _socket.fd()))
 {
     // 优雅关闭: 直到所剩数据发送完毕或超时
-    struct linger optLinger = { 0 };
-    optLinger.l_onoff = 1;
-    optLinger.l_linger = 1;
-    int ret;
-    ret = _socket.setsockopt(SOL_SOCKET, SO_LINGER, &optLinger, sizeof(optLinger));
+    //struct linger optLinger = { 0 };
+    //optLinger.l_onoff = 1;
+    //optLinger.l_linger = 1;
+    //int ret;
+    //ret = _socket.setsockopt(SOL_SOCKET, SO_LINGER, &optLinger, sizeof(optLinger));
 
     /* 端口复用 */
     int optval = 1;

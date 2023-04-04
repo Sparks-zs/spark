@@ -75,7 +75,7 @@ public:
 
     void ensureWriteable(size_t len){
         if(len > writeableBytes()){
-            _makeSpace(len - writeableBytes());
+            _makeSpace(len);
         }
         assert(len <= writeableBytes());
     }
@@ -126,9 +126,11 @@ private:
         return m_buf.data();
     }
 
-    // 先删除已读数据，在判断当前可写空间是否足够，不够则继续扩展空间
     void _makeSpace(size_t len){
-        if(m_readPos > 0){
+        if(writeableBytes() + prependableBytes() < len){
+            m_buf.resize(m_writePos + len + 1);
+        }
+        else{
             size_t readable = readableBytes();
             std::copy(_begin() + m_readPos,
                       _begin() + m_writePos,
@@ -137,9 +139,7 @@ private:
             m_writePos = m_readPos + readable;
             assert(readable == readableBytes());
         }
-        if(len > writeableBytes()){
-            m_buf.resize(m_writePos + writeableBytes() + len + 1);
-        }
+        
     }
 
     size_t m_readPos;

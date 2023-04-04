@@ -33,6 +33,7 @@ void HttpRequest::init()
 
 bool HttpRequest::parse(Buffer* buff)
 {
+    LOG_DEBUG << "HTTP REQUEST START PARSE";
     if(_state == FINISH) init();
 
     const char CRLF[] = "\r\n";
@@ -67,6 +68,7 @@ bool HttpRequest::parse(Buffer* buff)
         if(lineEnd == buff->beginWriteConst()) buff->retrieveUntil(lineEnd);
         else buff->retrieveUntil(lineEnd + 2);
     }
+    LOG_DEBUG << "HTTP REQUEST PARSE FINISHED";
     return true;
 }
 
@@ -113,8 +115,6 @@ bool HttpRequest::_parseRequestBody(const string& body)
     _body += body;
 
     if(len <= 0 || _body.size() < static_cast<size_t>(len)){
-        if(len) LOG_DEBUG << "当前请求体大小为: " << len;
-        else LOG_DEBUG << "无请求体";
         return false;
     }
 

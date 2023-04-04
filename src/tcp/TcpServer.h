@@ -40,7 +40,6 @@ public:
         
     }
     static void defaultWriteCallback(const TcpConnection::TcpConnectionPtr& conn){
-        
     }
     
 private:

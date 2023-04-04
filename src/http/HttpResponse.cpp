@@ -1,6 +1,7 @@
 #include "HttpResponse.h"
 #include "HTTP.h"
 
+
 using namespace std;
 
 HttpResponse::HttpResponse()
@@ -28,10 +29,10 @@ void HttpResponse::makeResponse()
     switch(_code){
     case OK:
         if(_isKeepAlive) {
-            _addHeader("Connection", "keep-alive");
-            _addHeader("keep-alive", "max=6, timeout=120");
+            addHeader("Connection", "keep-alive");
+            addHeader("keep-alive", "max=6, timeout=120");
         } else{
-            _addHeader("Connection", "close");
+            addHeader("Connection", "close");
         }
         break;
     case BAD_REQUEST:
@@ -43,9 +44,10 @@ void HttpResponse::makeResponse()
         break;
     }
     
-    _addHeader("Content-Length", to_string(_content.readableBytes()));
-    _addHeader("Content-Type", _type);
+    addHeader("Content-Length", to_string(_content.readableBytes()));
+    addHeader("Content-Type", _type);
     
+    _addHeader();
     _addBody();
 }
 
@@ -58,16 +60,22 @@ void HttpResponse::setCodeState(int code)
     _code = code;
 }
 
+void HttpResponse::addHeader(const std::string& header, const std::string& field)
+{
+    _headers[header] = field;
+}
+
 void HttpResponse::_addStateLine()
 {
     string line = "HTTP/1.1 " + to_string(_code) + " " +  HTTP_CODE_REASON.find(_code)->second + "\r\n";
     _writeBuffer.append(line);
 }
 
-void HttpResponse::_addHeader(const std::string& head, const std::string& field)
-{
-    string header = head + ": " + field + "\r\n";
-    _writeBuffer.append(header);
+void HttpResponse::_addHeader(){
+    int size = _headers.size();
+    for(auto& header : _headers){
+        _writeBuffer.append(header.first + ": " + header.second + "\r\n");
+    }
 }
 
 void HttpResponse::_addBody()
