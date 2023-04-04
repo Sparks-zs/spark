@@ -3,11 +3,15 @@
 
 using namespace std;
 
-LogStream::LogStream() {
-    writeThread_ = nullptr;
-    deque_ = nullptr;
-    _toDay = 0;
-    _curFilePath = "";
+LogStream::LogStream() 
+    : writeThread_(nullptr),
+    deque_(nullptr),
+    _toDay(0),
+    _curFilePath(""),
+    _dirPath("./log/"),
+    _level(0){
+
+    init(_level, _dirPath);
 }
 
 LogStream::~LogStream() {

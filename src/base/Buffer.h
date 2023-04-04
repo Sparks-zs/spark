@@ -9,11 +9,16 @@
 class Buffer
 {
 public:
-    Buffer(size_t size=4096): m_readPos(0), 
-        m_writePos(0), m_buf(size){}
-    
-    Buffer(const std::string& str, size_t size=4096): m_readPos(0), 
-        m_writePos(0), m_buf(size){
+    Buffer(size_t size=4096)
+    : m_readPos(0), m_writePos(0), m_buf(size){}
+
+    //Buffer(const char* str, size_t size = 4096)
+    //    : m_readPos(0), m_writePos(0), m_buf(size){
+    //    append(str, sizeof str);
+    //} 
+
+    Buffer(const std::string& str, size_t size=4096)
+        : m_readPos(0), m_writePos(0), m_buf(size){
         append(str);
     }
 

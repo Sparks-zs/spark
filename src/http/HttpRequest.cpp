@@ -20,7 +20,7 @@ void HttpRequest::init()
     _code = NO_REQUEST;
     _state = REQUEST_LINE;
     _method = " ";
-    _path = "";
+    _path = "/";
     _version = "";
     _body = "";
     _route = "";

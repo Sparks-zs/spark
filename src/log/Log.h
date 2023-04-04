@@ -24,7 +24,7 @@ class Thread;
 class LogStream{
 public:
     static LogStream* Instance();
-    void init(int level, const char* dirPath = "./");
+    void init(int level, const char* dirPath);
     void flush(const std::string& msg, const std::string& filePath, int lineCount);
 
     int GetLevel();

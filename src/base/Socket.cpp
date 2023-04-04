@@ -36,7 +36,7 @@ bool Socket::bind(Address address)
     int ret = ::bind(_socket, address.getSockaddr(), 
                     static_cast<socklen_t>(sizeof(struct sockaddr_in)));
     if(ret < 0){
-        LOG_ERROR << "socket bind error";
+        LOG_ERROR << "socket bind error is " << errno;
         return false;
     }
     return true;
