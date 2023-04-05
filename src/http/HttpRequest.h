@@ -51,6 +51,7 @@ private:
     void _parsePath();
     void _parseBody();
 
+    unsigned char _converHex(unsigned char ch);
     std::vector<std::string> _splitString(const std::string& str, char delim);
 
     PARSE_STATE _state;

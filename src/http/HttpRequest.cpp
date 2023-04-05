@@ -145,7 +145,22 @@ void HttpRequest::_parsePath()
     for(auto& query : ret){
         vector<string> r = _splitString(query, '=');
         if(r.size() == 2){
-            _query[r[0]] = r[1];
+            string value;
+            for(int i = 0; i < r[1].size(); i++){
+                if(r[1][i] == '%'){
+                    unsigned char high =  _converHex(r[1][i + 1]);
+                    unsigned char low = _converHex(r[1][i + 2]);
+                    value += high * 16 + low;
+                    i += 2;
+                }
+                else if(r[1][i] == '+'){
+                    value += ' ';
+                }
+                else{
+                    value += r[1][i];
+                }
+            }
+            _query[r[0]] = value;
         }
     }
 }
@@ -212,6 +227,14 @@ string HttpRequest::getQuery(const string& key) const
         value = _query.find(key)->second;
     }
     return value;
+}
+
+unsigned char HttpRequest::_converHex(unsigned char ch){
+    if(ch >= 'A' && ch <= 'Z') return ch - 'A' + 10;
+    else if(ch >= 'a' && ch <= 'z') return ch - 'a' + 10;
+    else if( ch >= '0' && ch <= '9') return ch - '0';
+    LOG_ERROR << "16进制转换失败";
+    return ch;
 }
 
 vector<string> HttpRequest::_splitString(const string& str, char delim)
