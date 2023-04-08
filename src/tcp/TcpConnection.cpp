@@ -71,7 +71,6 @@ void TcpConnection::handelRead()
         LOG_ERROR << "readFd err: " << saveErr;
         handleError();
     }
-    
 }
 
 void TcpConnection::handelWrite()

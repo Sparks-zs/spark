@@ -4,8 +4,8 @@ Address::Address(const std::string& ip, uint16_t port)
     : _ip(ip), _port(port)
 {
     _addr.sin_family = AF_INET;
-    _addr.sin_addr.s_addr = inet_pton(AF_INET, ip.c_str(), &_addr.sin_addr);
-    _addr.sin_port = port;
+    inet_pton(AF_INET, ip.c_str(), &_addr.sin_addr);
+    _addr.sin_port = htons(port);
 }
 
 Address::Address(uint16_t port)
@@ -28,7 +28,7 @@ const struct sockaddr* Address::getSockaddr() const
 
 Socket::~Socket()
 {
-    close();
+    //close();
 }
 
 bool Socket::bind(Address address)
@@ -64,6 +64,17 @@ int Socket::accept()
         return -1;
     } 
     return connfd;
+}
+
+void Socket::connect(const Address& address, int* err){
+    int ret = ::connect(_socket, address.getSockaddr(),
+                static_cast<socklen_t>(sizeof(struct sockaddr_in)));
+    if(ret < 0){
+        *err = errno;
+    }
+    else{
+        *err = 0;
+    }
 }
 
 bool Socket::setsockopt(int level, int optname, const void* optval, socklen_t optlen)

@@ -55,8 +55,6 @@ void EventLoop::loop()
         }
         _doPendingFunctors();
     }
-
-    _isLooping = false;
 }
 
 void EventLoop::quit()
@@ -106,8 +104,20 @@ void EventLoop::queueInLoop(const Functor& cb)
 void EventLoop::runEvery(int interval, Timer::TimeCallback cb)
 {
     TimeStamp time(TimeStamp::now() + interval);
-    _timerQueue->addTimer(time, interval, cb);
+    _timerQueue->addTimer(time, interval, std::move(cb));
 }
+
+void EventLoop::runAfter(int interval, Timer::TimeCallback cb)
+{
+    TimeStamp time(TimeStamp::now() + interval);
+    runAt(time, std::move(cb));
+}
+
+void EventLoop::runAt(TimeStamp time, Timer::TimeCallback cb)
+{
+    _timerQueue->addTimer(time, 0.0, std::move(cb));
+}
+
 
 void EventLoop::_doPendingFunctors()
 {

@@ -39,6 +39,8 @@ public:
     void queueInLoop(const Functor& cb);
 
     void runEvery(int interval, Timer::TimeCallback cb);
+    void runAfter(int interval, Timer::TimeCallback cb);
+    void runAt(TimeStamp time, Timer::TimeCallback cb);
 
 private:
     typedef std::vector<Channel*>ChannelList;

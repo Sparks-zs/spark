@@ -148,7 +148,7 @@ void HttpRequest::_parsePath()
             string value;
             for(int i = 0; i < r[1].size(); i++){
                 if(r[1][i] == '%'){
-                    unsigned char high =  _converHex(r[1][i + 1]);
+                    unsigned char high = _converHex(r[1][i + 1]);
                     unsigned char low = _converHex(r[1][i + 2]);
                     value += high * 16 + low;
                     i += 2;

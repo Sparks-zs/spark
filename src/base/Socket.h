@@ -20,6 +20,8 @@ public:
     Address(uint16_t port);
     ~Address();
 
+    std::string getIp() { return _ip; }
+    uint16_t getPort() { return _port; }
     const struct sockaddr* getSockaddr() const;
 
 private:
@@ -37,6 +39,7 @@ public:
     bool bind(Address address);
     bool listen(int maxConn=5);
     int accept();
+    void connect(const Address& address, int* err);
     void close();
 
     int fd() { return _socket; }
