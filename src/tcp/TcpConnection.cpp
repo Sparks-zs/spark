@@ -11,6 +11,8 @@ TcpConnection::TcpConnection(EventLoop* loop,
     _channel->setWriteCallback(std::bind(&TcpConnection::handelWrite, this));
     _channel->setCloseCallback(std::bind(&TcpConnection::handleClose, this));
     _channel->setErrorCallback(std::bind(&TcpConnection::handleError, this));
+    _socket->setKeepAlive(true);
+    _socket->setNoSigPipe(true);
 }
 
 TcpConnection::~TcpConnection()
@@ -68,33 +70,32 @@ void TcpConnection::handelRead()
         handleClose();
     }
     else{
-        LOG_ERROR << "readFd err: " << saveErr;
+        LOG_ERROR << "client fd: " << _channel->fd() << "read error code: " << saveErr;
         handleError();
     }
 }
 
 void TcpConnection::handelWrite()
 {
-    LOG_DEBUG << "START WRITE";
     if(_channel->isWriting()){
+        LOG_DEBUG << "WRITE DATA TO " << _channel->fd();
         ssize_t n = write(_channel->fd(),
                           _writeBuffer.peek(),
                           _writeBuffer.readableBytes());
-        LOG_DEBUG << "WRITE FINISHED";
         if(n > 0){
             _writeBuffer.retrieve(n);
             if(_writeBuffer.readableBytes() == 0){
                 _channel->disableWriting();
             }
         }
+        else LOG_DEBUG << "write return n: " << n;
     }
+    LOG_DEBUG << "WRITE FINISHED";
     _writeCallback(shared_from_this());
 }
 
 void TcpConnection::handleError()
 {
-    LOG_ERROR << "sockfd "<< _channel->fd() << "发生错误";
-    handleClose();
 }
 
 void TcpConnection::handleClose()

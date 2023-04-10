@@ -33,7 +33,8 @@ void HttpRequest::init()
 
 bool HttpRequest::parse(Buffer* buff)
 {
-    LOG_DEBUG << "HTTP REQUEST START PARSE";
+    LOG_DEBUG << "SERVER RECIVE HTTP DATA :\n" << buff->asString();
+    
     if(_state == FINISH) init();
 
     const char CRLF[] = "\r\n";
@@ -68,7 +69,6 @@ bool HttpRequest::parse(Buffer* buff)
         if(lineEnd == buff->beginWriteConst()) buff->retrieveUntil(lineEnd);
         else buff->retrieveUntil(lineEnd + 2);
     }
-    LOG_DEBUG << "HTTP REQUEST PARSE FINISHED";
     return true;
 }
 
@@ -146,7 +146,7 @@ void HttpRequest::_parsePath()
         vector<string> r = _splitString(query, '=');
         if(r.size() == 2){
             string value;
-            for(int i = 0; i < r[1].size(); i++){
+            for(size_t i = 0; i < r[1].size(); i++){
                 if(r[1][i] == '%'){
                     unsigned char high = _converHex(r[1][i + 1]);
                     unsigned char low = _converHex(r[1][i + 2]);
@@ -201,6 +201,15 @@ void HttpRequest::_parseBody()
         value.clear();
     }
 }
+bool HttpRequest::isKeepAlive() const{ 
+    if(_headers.count("Connection")){
+        std::string str = _headers.find("Connection")->second;
+        std::string temp = str;
+        std::transform(str.begin(), str.end(), temp.begin(), std::towlower);
+        return (temp.compare("keep-alive") == 0) && (_version == "1.1");
+    }
+    return false;
+}
 
 string HttpRequest::getHeader(const string& field) const
 {
@@ -229,6 +238,20 @@ string HttpRequest::getQuery(const string& key) const
     return value;
 }
 
+vector<uint64_t> HttpRequest::getRange() const{
+    vector<uint64_t> ret;
+    string bytes_range = getHeader("Range");
+    size_t bytes_pos = bytes_range.find("bytes=");
+    
+    if(bytes_pos != string::npos){
+        const vector<string> range = _splitString(bytes_range.substr(bytes_pos + 6), '-');
+        for(string r : range){
+            ret.push_back(stoll(r));
+        }
+    }
+    return ret;
+}
+
 unsigned char HttpRequest::_converHex(unsigned char ch){
     if(ch >= 'A' && ch <= 'Z') return ch - 'A' + 10;
     else if(ch >= 'a' && ch <= 'z') return ch - 'a' + 10;
@@ -237,7 +260,7 @@ unsigned char HttpRequest::_converHex(unsigned char ch){
     return ch;
 }
 
-vector<string> HttpRequest::_splitString(const string& str, char delim)
+vector<string> HttpRequest::_splitString(const string& str, char delim) const
 {
     stringstream ss(str);
     string item;

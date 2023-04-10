@@ -16,6 +16,9 @@ public:
 
     bool parse(Buffer* buff);
     void writeToBuffer(Buffer* buff);
+    
+    HttpRequest getRequest() const { return _request; }
+    HttpResponse getResponse() const { return _response; }
 
     void setHandleCallback(HandleCallback cb){
         _handleCallback = std::move(cb);

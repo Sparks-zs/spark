@@ -3,7 +3,7 @@
 #include <sys/epoll.h>
 
 const int Channel::kNoneEvent = 0;
-const int Channel::kReadEvent = EPOLLIN | EPOLLRDHUP | EPOLLHUP;
+const int Channel::kReadEvent = EPOLLIN | EPOLLPRI;
 const int Channel::kWriteEvent = EPOLLOUT;
 
 Channel::Channel(EventLoop* loop, int fd)
@@ -24,16 +24,19 @@ void Channel::_update()
 
 void Channel::handleEvent()
 {
-    if(_revents & (EPOLLRDHUP | EPOLLHUP)){
+    if((_revents & EPOLLHUP)){
+        LOG_DEBUG << "channel " << _fd <<" close";
         if(_closeCallback) _closeCallback();
     }
-    if(_revents & EPOLLIN){
+    else if(_revents & (EPOLLIN | EPOLLPRI | EPOLLRDHUP)){
         if(_readCallback) _readCallback();
     }
-    if(_revents & EPOLLOUT){
+    else if(_revents & EPOLLOUT){
         if(_writeCallback) _writeCallback();
     }
-
+    else if(_revents & (EPOLLERR)){
+        if(_errorCallback) _errorCallback();
+    }
 }
 
 void Channel::remove()

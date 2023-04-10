@@ -25,12 +25,7 @@ public:
     bool parse(Buffer* buff);
 
     int codeStatus() const { return _code; }
-    bool isKeepAlive(){ 
-        if(_headers.count("Connection")){
-            return _headers.find("Connection")->second == "keep-alive" && _version == "1.1";
-        }
-        return false;
-    }
+    bool isKeepAlive() const;
     bool finish() const { return _code == OK; }
 
     std::string getMethod() const { return _method; }
@@ -41,6 +36,7 @@ public:
     std::string getHeader(const std::string& field) const;
     std::string getQuery(const std::string& key) const;
     std::string getBody() const { return _body; }
+    std::vector<uint64_t> getRange() const;
 
 
 private:
@@ -52,7 +48,7 @@ private:
     void _parseBody();
 
     unsigned char _converHex(unsigned char ch);
-    std::vector<std::string> _splitString(const std::string& str, char delim);
+    std::vector<std::string> _splitString(const std::string& str, char delim) const;
 
     PARSE_STATE _state;
     HTTP_CODE_STATUS _code;

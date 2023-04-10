@@ -41,6 +41,7 @@ void TcpServer::setThreadPoolSize(int size)
 
 void TcpServer::newConnection(int clientFd)
 {
+    LOG_DEBUG << "new connection " << clientFd;
     EventLoop* ioLoop = _ioLoops->getNextLoop();
     TcpConnection::TcpConnectionPtr conn(
         new TcpConnection(ioLoop,
@@ -63,8 +64,11 @@ void TcpServer::removeConnection(const TcpConnection::TcpConnectionPtr& conn)
 void TcpServer::removeConnectionInLoop(const TcpConnection::TcpConnectionPtr& conn)
 {
     _loop->assertInLoopThread();
-    _connections.erase(conn);
+    size_t n = _connections.erase(conn);
+    if(n == 0){
+        return;
+    }
     EventLoop *ioLoop = conn->getLoop();
-    ioLoop->runInLoop(std::bind(&TcpConnection::destroy, conn));
-
+    ioLoop->queueInLoop(std::bind(&TcpConnection::destroy, conn));
+    LOG_DEBUG << conn->name() << " close";
 }

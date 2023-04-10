@@ -35,12 +35,12 @@ public:
     void send(Buffer* buffer);
     void send(const std::string& str);
 
-    int getSocketFd() { return _socket->fd(); }
-    std::string name() { return _name; }
+    int getSocketFd() const { return _socket->fd(); }
+    std::string name() const { return _name; }
 
-    bool connected() { return _state == Connected; }
+    bool connected() const { return _state == Connected; }
     void setState(ConnState s) { _state = s; }
-    EventLoop* getLoop() { return _loop; }
+    EventLoop* getLoop() const { return _loop; }
 
     void setContext(std::any context) { _context = context; }
     std::any* getContext() { return &_context; }

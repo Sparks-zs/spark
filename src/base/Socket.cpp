@@ -1,4 +1,5 @@
 #include "Socket.h"
+#include <signal.h>
 
 Address::Address(const std::string& ip, uint16_t port)
     : _ip(ip), _port(port)
@@ -96,4 +97,16 @@ void Socket::close()
 void Socket::setFdNonblock()
 {
     assert(fcntl(_socket, F_SETFL, fcntl(_socket, F_GETFD, 0) | O_NONBLOCK) >= 0);
+}
+
+void Socket::setKeepAlive(bool on){
+    int optval = on ? 1 : 0;
+    ::setsockopt(_socket, SOL_SOCKET, SO_KEEPALIVE,
+                 &optval, static_cast<socklen_t>(sizeof optval));
+}
+
+void Socket::setNoSigPipe(bool on){
+    struct sigaction sa;
+    sa.sa_handler = SIG_IGN;
+	signal(SIGPIPE, SIG_IGN);
 }

@@ -4,6 +4,7 @@ target_link_libraries(http
     log
     tcp
     base
+    utils
 )
 
 target_sources(http

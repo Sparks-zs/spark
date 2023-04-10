@@ -45,7 +45,9 @@ public:
     int fd() { return _socket; }
     bool setsockopt(int level, int optname, const void* optval, socklen_t optlen);
     void setFdNonblock();
-
+    void setKeepAlive(bool on);
+    void setNoSigPipe(bool on);
+    
 private:
     int _socket;
 };

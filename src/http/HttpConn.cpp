@@ -15,6 +15,7 @@ bool HttpConn::parse(Buffer* buff)
     if(!_request.parse(buff)){
         return false;
     }
+    _response.init();
     _response.setCodeState(_request.codeStatus());
     _response.setKeepAlive(_request.isKeepAlive());
     if(_handleCallback) _handleCallback(_request, _response, _request.getMethod());
@@ -25,5 +26,6 @@ bool HttpConn::parse(Buffer* buff)
 void HttpConn::writeToBuffer(Buffer* buff)
 {
     _response.makeResponse();
-    _response.writeToBuffer(buff);
+    _response.writeHeaderToBuffer(buff);
+    _response.writeBodyToBuffer(buff);
 }
